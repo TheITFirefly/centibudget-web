@@ -9,3 +9,4 @@
 <button onclick={() => count += 1}>
 	clicks: {count}
 </button>
+<p>This page will contain a dashboard to see a summary of everything, and ways to edit everything</p>
