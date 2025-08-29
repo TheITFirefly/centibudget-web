@@ -1,15 +1,15 @@
 <script lang="ts">
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
-
+	import { resolve } from '$app/paths';
 	let { children } = $props();
 </script>
 
 <nav>
-	<a href="/">home</a>
-	<a href="/funding-sources">Funding</a>
-	<a href="/accounts">Accounts</a>
-	<a href="/allocations">Allocations</a>
+	<a href="{resolve("/")}">home</a>
+	<a href="{resolve("/funding-sources")}">Funding</a>
+	<a href="{resolve("/accounts")}">Accounts</a>
+	<a href="{resolve("/allocations")}">Allocations</a>
 </nav>
 
 <svelte:head>
