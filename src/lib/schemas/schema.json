@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "CentiBudget",
+  "description": "Everything needed for CentiBudget, a personal finance system",
+  "type": "object",
+  "properties": {
+    "Schema Version": {
+      "type": "string",
+      "pattern": "^([0-9]+\\.){2}([0-9]+)$"
+    },
+    "Last Modification Date": {
+      "type": "string",
+      "format": "date",
+      "examples": ["2021-12-31", "2022-01-01"]
+    },
+    "Funding Sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Funding Type": {
+            "enum": [
+              "Salary",
+              "Hourly"
+            ]
+          },
+          "Rate": {
+            "type": "number",
+            "minimum": 0
+          },
+          "Pay Timing": {
+            "type": "object",
+            "properties": {
+              "Start Date": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "examples": ["2021-12-31", "2022-01-01"]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "First Pay Date": {
+                "type": "string",
+                "format": "date",
+                "examples": ["2021-12-31", "2022-01-01"]
+              },
+              "Period": {
+                "enum": [
+                  "Weekly",
+                  "Biweekly",
+                  "Monthly",
+                  "Yearly",
+                  "One-time"
+                ]
+              },
+              "End Date": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date",
+                    "examples": ["2021-12-31", "2022-01-01"]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "Hours Per Pay Period": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["Name", "Funding Type", "Rate", "Pay Timing", "Hours Per Pay Period"],
+        "additionalProperties": false
+      }
+    },
+    "Accounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Balance": {
+            "type": "number"
+          },
+          "Transactions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "Amount": {
+                  "type": "number"
+                },
+                "Date": {
+                  "type": "string",
+                  "format": "date",
+                  "examples": ["2021-12-31", "2022-01-01"]
+                }
+              },
+              "required": ["Name", "Amount", "Date"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["Name", "Balance", "Transactions"],
+        "additionalProperties": false
+      }
+    },
+    "Allocations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Type": {
+            "enum": [
+              "Fixed",
+              "Percentage",
+              "Subscription"
+            ]
+          },
+          "Period": {
+            "enum": [
+              "Weekly",
+              "Biweekly",
+              "Monthly",
+              "Yearly",
+              "One-time",
+              "Constant"
+            ]
+          },
+          "Last Paid": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "examples": ["2021-12-31", "2022-01-01"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+
+          },
+          "Amount": {
+            "type":"number"
+          },
+          "Account": {
+            "type": "string"
+          }
+        },
+        "required": ["Name", "Type", "Period", "Last Paid", "Amount", "Account"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["Schema Version", "Last Modification Date", "Funding Sources", "Allocations", "Accounts"],
+  "additionalProperties": false
+}

@@ -1,0 +1,159 @@
+{
+  "Schema Version": "2.0.1",
+  "Last Modification Date": "2025-04-21",
+  "Funding Sources": [
+    {
+      "Name": "full-time source",
+      "Funding Type": "Hourly",
+      "Rate": 17.50,
+      "Pay Timing": {
+        "Start Date": null,
+        "First Pay Date": "2025-05-23",
+        "Period":"Biweekly",
+        "End Date": null
+      },
+      "Hours Per Pay Period": 40
+    },
+    {
+      "Name": "part-time source",
+      "Funding Type": "Hourly",
+      "Rate": 21,
+      "Pay Timing": {
+        "Start Date": null,
+        "First Pay Date": "2025-05-23",
+        "Period": "Biweekly",
+        "End Date": null
+      },
+      "Hours Per Pay Period": 20
+    },
+    {
+      "Name": "student source",
+      "Funding Type": "Hourly",
+      "Rate": 22.00,
+      "Pay Timing": {
+        "Start Date": "2025-05-09",
+        "First Pay Date":"2025-05-23",
+        "Period":"Biweekly",
+        "End Date": "2025-08-29"
+      },
+      "Hours Per Pay Period": 40
+    },
+    {
+      "Name": "student source",
+      "Funding Type": "Hourly",
+      "Rate": 22.00,
+      "Pay Timing": {
+        "Start Date": "2025-08-29",
+        "First Pay Date":"2025-08-29",
+        "Period": "Biweekly",
+        "End Date": null
+      },
+      "Hours Per Pay Period": 20
+    },
+    {
+      "Name": "salary source",
+      "Funding Type": "Salary",
+      "Rate": 65000.00,
+      "Pay Timing": {
+        "Start Date": null,
+        "Period": "Monthly"
+      },
+      "Hours Per Pay Period": null
+    }
+  ],
+  "Accounts": [
+    {
+      "Name": "Emergency Fund",
+      "Balance": 6000.00,
+      "Transactions": [
+        {
+          "Name": null,
+          "Amount": -20.00,
+          "Date": "2025-05-28"
+        }
+      ]
+    },
+    {
+      "Name": "Tithing",
+      "Balance": 6000.00,
+      "Transactions": []
+    },
+    {
+      "Name": "Entertainment",
+      "Balance": 45.43,
+      "Transactions": []
+    },
+    {
+      "Name": "Dance",
+      "Balance": 124.50,
+      "Transactions": [
+        {
+          "Name": "Dance shoes",
+          "Amount": -125.00,
+          "Date":"2025-05-28"
+        },
+        {
+          "Name": "Deposit",
+          "Amount": 125.00,
+          "Date":"2025-05-27"
+        }
+      ]
+    },
+    {
+      "Name": "Gifts",
+      "Balance": 359.00,
+      "Transactions": []
+    }
+    
+  ],
+  "Allocations": [
+    {
+      "Name": "Tithing",
+      "Type": "Percentage",
+      "Period": "Constant",
+      "Last Paid": null,
+      "Amount": 10.00,
+      "Account": "Tithing"
+    },
+    {
+      "Name": "Emergency Fund",
+      "Type": "Fixed",
+      "Period": "One-time",
+      "Last Paid": null,
+      "Amount": 12000.00,
+      "Account": "Emergency Fund"
+    },
+    {
+      "Name": "Spotify",
+      "Type": "Subscription",
+      "Period": "Monthly",
+      "Last Paid": "2021-12-31",
+      "Amount": 12000.00,
+      "Account": "Entertainment"
+    },
+    {
+      "Name": "Gifts",
+      "Type": "Percentage",
+      "Period": "One-time",
+      "Last Paid": null,
+      "Amount": 15.00,
+      "Account": "Gifts"
+    },
+    {
+      "Name": "Dance shoes",
+      "Type": "Fixed",
+      "Period": "One-time",
+      "Last Paid": null,
+      "Amount": 350.00,
+      "Account": "Dance"
+    },
+    {
+      "Name": "Lessons",
+      "Type": "Subscription",
+      "Period": "Weekly",
+      "Last Paid": "2021-12-31",
+      "Amount": 80.00,
+      "Account": "Dance"
+    }
+  ]
+}
