@@ -8,6 +8,7 @@
 //   console.log(typeof budget.current.Accounts[0].Transactions[0])
 
   let text = $state(JSON.stringify(budget.current, null, 2));
+  let importstatus = $state(false);
 
   function reloadFromStorage() {
 	const value = budget.current;
@@ -19,35 +20,50 @@
   }
 
   function importJson() {
-	try {
-	  const parsed = JSON.parse(text);
-	  const result = validateBudget(parsed);
-	  if (!result.valid) {
-	    console.error(result.errors);
-		alert("Schema validation failed");
-		return;
-	  }
-	  budget.current = parsed;
+    try {
+      const parsed = JSON.parse(text);
+      const result = validateBudget(parsed);
+
+      if (!result.valid) {
+        importstatus = false;
+        console.error(result.errors);
+        alert("Schema validation failed");
+        return;
+      }
+
+      budget.current = parsed;
+      importstatus = true;
     } catch {
-	  alert("Invalid JSON");
-	}
+      importstatus = false;
+      alert("Invalid JSON");
+    }
   }
 </script>
-
-<p>Hey there! If you found this, I haven't quite finished up with the dashboard or any UI stuff yet.</p>
-<p>This page right now is just for testing whether or not your budget matches the known schema</p>
-<p>Press import to test your current schema, and reload to load something fresh.</p>
+<div class="p-2">
+<p>Hey there! If you found this, the fancy UI isn't quite finished yet, but it is being worked on.</p>
+<p>Right now this page is for testing if your budget matches the known schema, and deleting stuff from your budget</p>
+<p>Press import to import the budget in the text area, or reload (after clearing local storage) to load a fresh budget without anything in it.</p>
+<br/>
 <p>Data persists to localstorage. To clear it open up a console in dev tools and run this command:</p>
 <p>localStorage.removeItem("Budget")</p>
+<br/>
 <p>Happy testing! :)</p>
+
+{#if importstatus}
+  <p class="text-green-600 font-medium">
+    Import successful!
+  </p>
+{/if}
 
 <Textarea
   bind:value={text}
-  class="min-h-144 font-mono"
+  class="min-h-60 font-mono"
   spellcheck="false"
 />
+
 
 <div class="flex gap-2">
   <Button onclick={importJson}>Import</Button>
   <Button onclick={reloadFromStorage}>Reload</Button>
+</div>
 </div>
