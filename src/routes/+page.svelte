@@ -1,12 +1,11 @@
 <script>
   import Button from "$lib/components/ui/button/button.svelte";
   import { budget } from "$lib/shared.svelte";
-  let budgetObject = $state(budget.current);
-  let income = budgetObject['Funding Sources'];
-  let allocations = budgetObject['Allocations'];
+  let income = budget.current['Funding Sources'];
+  let allocations = budget.current['Allocations'];
   let savingsGoals = allocations.filter(allocation => allocation['Type'] === "Fixed");
   let subscriptions = allocations.filter(allocation => allocation['Type'] === "Subscription")
-  let accounts = budgetObject['Accounts'];
+  let accounts = budget.current['Accounts'];
 
   // Function to get the balance of an account based on the account name
   function getAccountBalance(accountName) {

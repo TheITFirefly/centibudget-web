@@ -2,8 +2,6 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import { budget } from "$lib/shared.svelte";
 
-  let accounts = $state(budget.current["Accounts"]);
-
   let newAccountName = $state("");
   let newAccountBalance = $state(0);
 
@@ -12,6 +10,8 @@
       alert("Account name is required");
       return;
     }
+
+    const accounts = budget.current["Accounts"];
 
     const exists = accounts.some(
       acc => acc["Name"] === newAccountName
@@ -33,8 +33,6 @@
       Accounts: [...accounts, newAccount]
     };
 
-    accounts = budget.current["Accounts"];
-
     newAccountName = "";
     newAccountBalance = 0;
   }
@@ -48,20 +46,22 @@
 
 <div class="flex gap-3 items-end mb-6">
   <div class="flex flex-col">
-    <label class="text-sm">Account Name</label>
+    <label class="text-sm" for="account-name-input">Account Name</label>
     <input
       class="border px-2 py-1"
       bind:value={newAccountName}
       placeholder="Checking"
+      id="account-name-input"
     />
   </div>
 
   <div class="flex flex-col">
-    <label class="text-sm">Starting Balance</label>
+    <label class="text-sm" for="starting-balance-input">Starting Balance</label>
     <input
       type="number"
       class="border px-2 py-1"
       bind:value={newAccountBalance}
+      id="starting-balance-input"
     />
   </div>
 
@@ -80,7 +80,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each accounts as account}
+    {#each budget.current["Accounts"] as account}
       <tr>
         <td class="border-b border-r px-4 py-2">
           {account["Name"]}

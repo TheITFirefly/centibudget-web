@@ -2,8 +2,6 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import { budget } from "$lib/shared.svelte";
 
-  let sources = $state(budget.current["Funding Sources"]);
-
   let name = $state("");
   let fundingType = $state<"Hourly" | "Salary">("Hourly");
   let rate = $state(0);
@@ -57,10 +55,10 @@
 
     budget.current = {
       ...budget.current,
-      "Funding Sources": [...sources, source]
+      "Funding Sources": [...budget.current["Funding Sources"], source]
     };
 
-    sources = budget.current["Funding Sources"];
+    budget.current["Funding Sources"] = budget.current["Funding Sources"];
 
     // Reset
     name = "";
@@ -81,30 +79,35 @@
 
 <div class="grid grid-cols-2 gap-4 max-w-2xl mb-6">
   <div>
-    <label>Name</label>
-    <input class="border px-2 py-1 w-full" bind:value={name} />
+    <label for="funding-source-name-input">Name</label>
+    <input
+      class="border px-2 py-1 w-full"
+      bind:value={name}
+      id="funding-source-name-input" 
+    />
   </div>
 
   <div>
-    <label>Funding Type</label>
-    <select class="border px-2 py-1 w-full" bind:value={fundingType}>
+    <label for="funding-type-selector">Funding Type</label>
+    <select class="border px-2 py-1 w-full" bind:value={fundingType} id="funding-type-selector">
       <option value="Hourly">Hourly</option>
       <option value="Salary">Salary</option>
     </select>
   </div>
 
   <div>
-    <label>Rate</label>
+    <label for="pay-rate-input">Rate</label>
     <input
       type="number"
       class="border px-2 py-1 w-full"
       bind:value={rate}
+      id="pay-rate-input"
     />
   </div>
 
   <div>
-    <label>Pay Period</label>
-    <select class="border px-2 py-1 w-full" bind:value={period}>
+    <label for="pay-period-selector">Pay Period</label>
+    <select class="border px-2 py-1 w-full" bind:value={period} id="pay-period-selector">
       <option>Weekly</option>
       <option>Biweekly</option>
       <option>Monthly</option>
@@ -115,38 +118,42 @@
 
   {#if fundingType === "Hourly"}
     <div>
-      <label>Hours Per Pay Period</label>
+      <label for="hours-per-period-input">Hours Per Pay Period</label>
       <input
         type="number"
         class="border px-2 py-1 w-full"
         bind:value={hoursPerPayPeriod}
+        id="hours-per-period-input"
       />
     </div>
 
     <div>
-      <label>First Pay Date</label>
+      <label for="first-pay-date-selector">First Pay Date</label>
       <input
         type="date"
         class="border px-2 py-1 w-full"
         bind:value={firstPayDate}
+        id="first-pay-date-selector"
       />
     </div>
 
     <div>
-      <label>Start Date</label>
+      <label for="start-date-selector">Start Date</label>
       <input
         type="date"
         class="border px-2 py-1 w-full"
         bind:value={startDate}
+        id="start-date-selector"
       />
     </div>
 
     <div>
-      <label>End Date</label>
+      <label for="end-date-selector">End Date</label>
       <input
         type="date"
         class="border px-2 py-1 w-full"
         bind:value={endDate}
+        id="end-date-selector"
       />
     </div>
   {/if}
@@ -166,7 +173,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each sources as src}
+    {#each budget.current["Funding Sources"] as src}
       <tr>
         <td class="border-b border-r px-4 py-2">{src["Name"]}</td>
         <td class="border-b border-r px-4 py-2">{src["Funding Type"]}</td>
