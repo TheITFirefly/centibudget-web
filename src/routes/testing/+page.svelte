@@ -67,3 +67,12 @@
   <Button onclick={reloadFromStorage}>Reload</Button>
 </div>
 </div>
+
+<div class="fixed bottom-2 right-2 z-50 px-3 py-1 text-xs font-mono rounded bg-black text-white opacity-80 pointer-events-none">
+  <span class="block sm:hidden">xs (&lt;640px)</span>
+  <span class="hidden sm:block md:hidden">sm (≥640px)</span>
+  <span class="hidden md:block lg:hidden">md (≥768px)</span>
+  <span class="hidden lg:block xl:hidden">lg (≥1024px)</span>
+  <span class="hidden xl:block 2xl:hidden">xl (≥1280px)</span>
+  <span class="hidden 2xl:block">2xl (≥1536px)</span>
+</div>

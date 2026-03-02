@@ -30,12 +30,19 @@
     const timeDifference = nextPayDate - today;
     return Math.floor(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
   }
+
+  function getProgress(goal) {
+  const saved = getAccountBalance(goal["Account"]);
+  const total = goal["Amount"];
+  if (!total) return 0;
+  return Math.min(100, Math.round((saved / total) * 100));
+}
 </script>
 
-<h1 class="text-4xl text-heading">Dashboard</h1>
-This is just a barebones implementation of the data viewing that will happen once all of the UI components are written
+<h1 class="text-4xl text-heading text-center">Dashboard</h1>
+<p class="text-center">This is just a barebones implementation of the data viewing that will happen once all of the UI components are written</p>
 
-<h2 class="text-3xl text-heading">Income</h2>
+<h2 class="text-3xl text-heading text-center">Income</h2>
 <table class="table-auto border-collapse border">
   <thead>
     <tr>
@@ -55,25 +62,42 @@ This is just a barebones implementation of the data viewing that will happen onc
   </tbody>
 </table>
 
-<h2 class="text-3xl text-heading">Savings Goals</h2>
-<table class="table-auto border-collapse border">
-  <thead>
-    <tr>
-      <th class="border-b border-r px-4 py-2">Goal Name</th>
-      <th class="border-b border-r px-4 py-2">Amount Needed</th>
-      <th class="border-b border-r px-4 py-2">Amount Saved</th>
-    </tr>
-  </thead>
-  <tbody>
+<h2 class="text-3xl text-heading text-center">Savings Goals</h2>
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,128px)]">
     {#each savingsGoals as savingsGoal}
-      <tr>
-        <td class="border-b border-r px-4 py-2">{ savingsGoal["Name"] }</td>
-        <td class="border-b border-r px-4 py-2">{ savingsGoal["Amount"] }</td>
-        <td class="border-b border-r px-4 py-2">{ getAccountBalance(savingsGoal["Account"]) }</td>
-      </tr>
+      {@const progress = getProgress(savingsGoal)}
+      <div
+        class="h-40 border rounded-lg flex flex-col overflow-hidden transition-all duration-300">
+
+        <!-- Header -->
+        <div class="text-center font-semibold py-2 border-b">
+          {savingsGoal["Name"]}
+        </div>
+
+        <!-- Bucket -->
+        <div class="relative flex-1 overflow-hidden">
+          <div
+            class="absolute bottom-0 left-0 w-full bg-primary transition-all duration-300
+            rounded-t-md
+            {progress === 100 ? 'animate-pulse-slow' : ''}"
+            style="height: {progress}%"
+          ></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-sm py-2 border-t">
+          ${getAccountBalance(savingsGoal["Account"])}
+          /
+          ${savingsGoal["Amount"]}
+          ({progress}%)
+        </div>
+
+      </div>
     {/each}
-  </tbody>
-</table>
+  </div>
+</div>
 
 <h2 class="text-3xl text-heading">Subscriptions</h2>
 Days until next pay date currently assumes monthly (30 days)
