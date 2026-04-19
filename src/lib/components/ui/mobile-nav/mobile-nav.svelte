@@ -1,11 +1,11 @@
 <script>
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as Popover from "$lib/components/ui/popover/index.js";
-	import { resolve } from '$app/paths';
-	import { Menu } from 'lucide-svelte';
-	import { X } from 'lucide-svelte';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import * as Popover from "$lib/components/ui/popover/index.js";
+  import { resolve } from '$app/paths';
+  import { Menu } from 'lucide-svelte';
+  import { X } from 'lucide-svelte';
   import { afterNavigate } from '$app/navigation';
-	import { DarkModeButton } from '$lib/components/ui/dark-mode-button/index.js';
+  import { DarkModeButton } from '$lib/components/ui/dark-mode-button/index.js';
 
   //Make Navigation Menu close on navigation  in mobile devices
   let open = $state(false);
