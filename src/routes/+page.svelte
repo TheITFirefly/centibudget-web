@@ -3,6 +3,9 @@
   import * as Empty from "$lib/components/ui/empty/index.js";
   import Button from "$lib/components/ui/button/button.svelte";
   import SavingsGoalBucket from '$lib/components/ui/savings-goal-bucket/savings-goal-bucket.svelte';
+  import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
+  import IncomeSourceCard from '$lib/components/ui/income-source-card/income-source-card.svelte';
+  import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
   import { budget } from "$lib/shared.svelte";
   let income = budget.current['Funding Sources'];
@@ -31,7 +34,6 @@
 </script>
 
 <h1 class="text-4xl text-heading text-center">Dashboard</h1>
-<p class="text-center">This is just a barebones implementation of the data viewing that will happen once all of the UI components are written</p>
 
 <h2 class="text-3xl text-heading text-center">Income</h2>
 {#if income.length === 0}
@@ -49,24 +51,15 @@
   </Empty.Content>
 </Empty.Root>
 {:else}
-<table class="table-auto border-collapse border">
-  <thead>
-    <tr>
-      <th class="border-b border-r px-4 py-2">Name</th>
-      <th class="border-b border-r px-4 py-2">Next Pay Date</th>
-      <th class="border-b border-r px-4 py-2">Days Until Next Pay Date</th>
-    </tr>
-  </thead>
-  <tbody>
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,256px)]">
     {#each income as source}
-      <tr>
-        <td class="border-b border-r px-4 py-2">{ source["Name"] }</td>
-        <td class="border-b border-r px-4 py-2">{ source["Pay Timing"]["First Pay Date"] }</td>
-        <td class="border-b border-r px-4 py-2">{ daysUntilNextPayDate(source["Pay Timing"]["First Pay Date"]) }</td>
-      </tr>
+      <IncomeSourceCard source={source} />
     {/each}
-  </tbody>
-</table>
+  </div>
+</div>
+<br/>
 {/if}
 
 <h2 class="text-3xl text-heading text-center">Savings Goals</h2>
@@ -93,6 +86,7 @@
     {/each}
   </div>
 </div>
+<br/>
 {/if}
 
 <h2 class="text-3xl text-heading text-center">Subscriptions</h2>
@@ -111,27 +105,15 @@
   </Empty.Content>
 </Empty.Root>
 {:else}
-Days until next pay date currently assumes monthly (30 days)
-<table class="table-auto border-collapse border">
-  <thead>
-    <tr>
-      <th class="border-b border-r px-4 py-2">Name</th>
-      <th class="border-b border-r px-4 py-2">Amount</th>
-      <th class="border-b border-r px-4 py-2">Next Pay Date</th>
-      <th class="border-b border-r px-4 py-2">Days Until Next Pay Date</th>
-    </tr>
-  </thead>
-  <tbody>
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,320px)]">
     {#each subscriptions as subscription}
-      <tr>
-        <td class="border-b border-r px-4 py-2">{ subscription["Name"] }</td>
-        <td class="border-b border-r px-4 py-2">${ subscription["Amount"] }</td>
-        <td class="border-b border-r px-4 py-2">{ calculateNextPayDate(subscription["Last Paid"], subscription["Period"]).toLocaleDateString() }</td>
-        <td class="border-b border-r px-4 py-2">{ daysUntilNextPayDate(calculateNextPayDate(subscription["Last Paid"], subscription["Period"])) }</td>
-      </tr>
+      <SubscriptionCard subscription={subscription} />
     {/each}
-  </tbody>
-</table>
+  </div>
+</div>
+<br/>
 {/if}
 
 <h2 class="text-3xl text-heading text-center">Accounts</h2>
@@ -150,20 +132,13 @@ Days until next pay date currently assumes monthly (30 days)
   </Empty.Content>
 </Empty.Root>
 {:else}
-<table class="table-auto border-collapse border">
-  <thead>
-    <tr>
-      <th class="border-b border-r px-4 py-2">Account Name</th>
-      <th class="border-b border-r px-4 py-2">Balance</th>
-    </tr>
-  </thead>
-  <tbody>
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,160px)]">
     {#each accounts as account}
-      <tr>
-        <td class="border-b border-r px-4 py-2">{ account["Name"] }</td>
-        <td class="border-b border-r px-4 py-2">{ account["Balance"] }</td>
-      </tr>
+      <AccountCard account={account} />
     {/each}
-  </tbody>
-</table>
+  </div>
+</div>
+<br/>
 {/if}

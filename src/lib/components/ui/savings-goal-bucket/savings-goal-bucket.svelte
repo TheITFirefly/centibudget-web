@@ -1,5 +1,6 @@
 <script>
   import { budget } from "$lib/shared.svelte";
+  import { formatCurrency } from "$lib/formatters";
 
   let { goal } = $props();
 
@@ -15,6 +16,9 @@
 
     return Math.min(100, Math.round((balance / total) * 100));
   });
+
+  const formattedBalance = $derived(formatCurrency(balance));
+  const formattedTotal = $derived(formatCurrency(goal["Amount"]));
 </script>
 
 <div class="h-40 border rounded-lg flex flex-col overflow-hidden transition-all duration-300">
@@ -35,9 +39,9 @@
 
   <!-- Footer -->
   <div class="text-center text-sm py-2 border-t">
-    ${balance}
+    {formattedBalance}
     /
-    ${goal["Amount"]}
+    {formattedTotal}
     ({progress}%)
   </div>
 
