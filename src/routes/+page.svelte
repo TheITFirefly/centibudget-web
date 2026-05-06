@@ -10,11 +10,11 @@
 	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
   import { budget } from "$lib/shared.svelte";
 	import EmptyContent from '$lib/components/ui/empty/empty-content.svelte';
-  let income = budget.current['Funding Sources'];
-  let allocations = budget.current['Allocations'];
-  let savingsGoals = allocations.filter(allocation => allocation['Type'] === "Fixed");
-  let subscriptions = allocations.filter(allocation => allocation['Type'] === "Subscription")
-  let accounts = budget.current['Accounts'];
+  let income = $derived(budget.current['Funding Sources']);
+  let allocations = $derived(budget.current['Allocations']);
+  let savingsGoals = $derived(allocations.filter(allocation => allocation['Type'] === "Fixed"));
+  let subscriptions = $derived(allocations.filter(allocation => allocation['Type'] === "Subscription"));
+  let accounts = $derived(budget.current['Accounts']);
 
   function calculateNextPayDate(lastPaidDate, period) {
     const lastPaid = new Date(lastPaidDate);
