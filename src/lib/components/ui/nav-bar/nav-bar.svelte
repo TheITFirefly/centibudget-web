@@ -1,12 +1,14 @@
-<script>
+<script lang=ts>
   import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import * as NavigationMenu from "$lib/components/ui/navigation-menu/index.js";
 	import { DarkModeButton } from '$lib/components/ui/dark-mode-button/index.js';
 
   const pathname = $derived(page.url.pathname);
-  const isActive = (path) =>
-    pathname === path || pathname.startsWith(`${path}/`);
+  const isActive = (path: string) => {
+    const resolvedPath = resolve(path);
+    return pathname === resolvedPath || pathname.startsWith(`${resolvedPath}/`);
+  };
 
 </script>
 
