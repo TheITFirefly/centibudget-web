@@ -6,7 +6,7 @@
 	import EmptyState from "$lib/components/ui/empty-state/empty-state.svelte";
   import { PiggyBank } from "lucide-svelte";
   
-  let accounts = budget.current['Accounts'];
+  let accounts = $derived(budget.current['Accounts']);
   let newAccountName = $state("");
   let newAccountBalance = $state(0);
 
@@ -16,26 +16,15 @@
       return;
     }
 
-    const accounts = budget.current["Accounts"];
-
-    const exists = accounts.some(
-      acc => acc["Name"] === newAccountName
-    );
-
+    const exists = accounts.some(acc => acc["Name"] === newAccountName);
     if (exists) {
       alert("An account with this name already exists");
       return;
     }
 
-    const newAccount = {
-      Name: newAccountName,
-      Balance: Number(newAccountBalance),
-      Transactions: []
-    };
-
     budget.current = {
       ...budget.current,
-      Accounts: [...accounts, newAccount]
+      Accounts: [...accounts, { Name: newAccountName, Balance: Number(newAccountBalance), Transactions: [] }]
     };
 
     newAccountName = "";
