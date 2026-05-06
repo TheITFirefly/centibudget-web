@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import * as Empty from '$lib/components/ui/empty/index.js';
 	import type { Component } from 'svelte';
 
@@ -26,7 +25,7 @@
 	</Empty.Header>
 	<Empty.Content>
 		<Empty.Description>
-			{description} <a href={resolve(href)}>here</a>
+			{description} <a href={href}>here</a>
 		</Empty.Description>
 	</Empty.Content>
 </Empty.Root>
