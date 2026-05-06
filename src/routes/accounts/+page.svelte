@@ -1,7 +1,12 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
   import Button from "$lib/components/ui/button/button.svelte";
+  import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
   import { budget } from "$lib/shared.svelte";
-
+	import EmptyState from "$lib/components/ui/empty-state/empty-state.svelte";
+  import { PiggyBank } from "lucide-svelte";
+  
+  let accounts = budget.current['Accounts'];
   let newAccountName = $state("");
   let newAccountBalance = $state(0);
 
@@ -70,25 +75,23 @@
   </Button>
 </div>
 
-<h2 class="text-2xl mb-2">Existing Accounts</h2>
-
-<table class="table-auto border-collapse border w-full">
-  <thead>
-    <tr>
-      <th class="border-b border-r px-4 py-2">Name</th>
-      <th class="border-b px-4 py-2">Balance</th>
-    </tr>
-  </thead>
-  <tbody>
-    {#each budget.current["Accounts"] as account}
-      <tr>
-        <td class="border-b border-r px-4 py-2">
-          {account["Name"]}
-        </td>
-        <td class="border-b px-4 py-2">
-          ${account["Balance"]}
-        </td>
-      </tr>
+<h2 class="text-2xl mb-2 text-center">Existing Accounts</h2>
+{#if accounts.length === 0}
+  <EmptyState
+    icon={PiggyBank}
+    title="No Existing Accounts"
+    description="Add an account"
+    href="{resolve("/accounts")}"
+  />
+{:else}
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,160px)]">
+    {#each accounts as account}
+      <AccountCard account={account} />
     {/each}
-  </tbody>
-</table>
+  </div>
+</div>
+<br/>
+{/if}
+
