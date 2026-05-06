@@ -6,8 +6,10 @@
   import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
   import IncomeSourceCard from '$lib/components/ui/income-source-card/income-source-card.svelte';
   import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
+  import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
   import { budget } from "$lib/shared.svelte";
+	import EmptyContent from '$lib/components/ui/empty/empty-content.svelte';
   let income = budget.current['Funding Sources'];
   let allocations = budget.current['Allocations'];
   let savingsGoals = allocations.filter(allocation => allocation['Type'] === "Fixed");
@@ -37,19 +39,12 @@
 
 <h2 class="text-3xl text-heading text-center">Income</h2>
 {#if income.length === 0}
-<Empty.Root>
-  <Empty.Header>
-    <Empty.Media variant="icon">
-      <BanknoteArrowUp/>
-    </Empty.Media>
-    <Empty.Title>No Income sources</Empty.Title>
-  </Empty.Header>
-  <Empty.Content>
-    <Empty.Description>
-      Add an income source <a href={resolve("/funding-sources")}>here</a>
-    </Empty.Description>
-  </Empty.Content>
-</Empty.Root>
+  <EmptyState
+    icon={BanknoteArrowUp}
+    title="No Income Sources"
+    description="Add an income source"
+    href="{resolve("/funding-sources")}"
+  />
 {:else}
 <br/>
 <div class="max-w-7xl mx-auto px-4">
@@ -64,19 +59,12 @@
 
 <h2 class="text-3xl text-heading text-center">Savings Goals</h2>
 {#if savingsGoals.length === 0}
-<Empty.Root>
-  <Empty.Header>
-    <Empty.Media variant="icon">
-      <Target/>
-    </Empty.Media>
-    <Empty.Title>No Savings Goals</Empty.Title>
-  </Empty.Header>
-  <Empty.Content>
-    <Empty.Description>
-      Add a savings goal <a href={resolve("/allocations")}>here</a>
-    </Empty.Description>
-  </Empty.Content>
-</Empty.Root>
+  <EmptyState 
+    icon={Target}
+    title="No Savings Goals"
+    description="Add a savings goal"
+    href="{resolve("/allocations")}"
+  />
 {:else}
 <br/>
 <div class="max-w-7xl mx-auto px-4">
@@ -91,19 +79,12 @@
 
 <h2 class="text-3xl text-heading text-center">Subscriptions</h2>
 {#if subscriptions.length === 0}
-<Empty.Root>
-  <Empty.Header>
-    <Empty.Media variant="icon">
-      <CalendarSync/>
-    </Empty.Media>
-    <Empty.Title>No Subscriptions</Empty.Title>
-  </Empty.Header>
-  <Empty.Content>
-    <Empty.Description>
-      Add a subscription <a href={resolve("/allocations")}>here</a>
-    </Empty.Description>
-  </Empty.Content>
-</Empty.Root>
+  <EmptyState 
+    icon={CalendarSync}
+    title="No Subscriptions"
+    description="Add a subscription"
+    href="{resolve("/allocations")}"
+  />
 {:else}
 <br/>
 <div class="max-w-7xl mx-auto px-4">
@@ -118,19 +99,12 @@
 
 <h2 class="text-3xl text-heading text-center">Accounts</h2>
 {#if accounts.length === 0}
-<Empty.Root>
-  <Empty.Header>
-    <Empty.Media variant="icon">
-      <PiggyBank/>
-    </Empty.Media>
-    <Empty.Title>No Accounts</Empty.Title>
-  </Empty.Header>
-  <Empty.Content>
-    <Empty.Description>
-      Add an account <a href={resolve("/accounts")}>here</a>
-    </Empty.Description>
-  </Empty.Content>
-</Empty.Root>
+  <EmptyState
+    icon={PiggyBank}
+    title="No Accounts"
+    description="Add an account"
+    href="{resolve("/accounts")}"
+  />
 {:else}
 <br/>
 <div class="max-w-7xl mx-auto px-4">
