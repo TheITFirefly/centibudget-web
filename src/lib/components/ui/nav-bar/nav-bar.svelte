@@ -60,7 +60,7 @@
       <NavigationMenu.Link
         href={resolve("/testing")}
         class={isActive("/testing") ? "text-primary font-semibold bg-accent" : ""}
-        aria-current={isActive("/accounts") ? "page" : undefined}
+        aria-current={isActive("/testing") ? "page" : undefined}
       >
         Testing Area
       </NavigationMenu.Link>

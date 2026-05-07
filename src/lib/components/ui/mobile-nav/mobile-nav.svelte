@@ -22,7 +22,7 @@
 <nav class="fixed top-0 w-full bg-background sm:hidden">
   <div class="flex items-center justify-between px-4 py-2 shadow-md">
   <Popover.Root bind:open>
-		<Popover.Trigger>
+		<Popover.Trigger asChild>
 			<Button variant="outline" size="icon" aria-label="Toggle menu">
 				{#if open}
 					<X />
