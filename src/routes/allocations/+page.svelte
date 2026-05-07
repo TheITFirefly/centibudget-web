@@ -1,9 +1,18 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
   import Button from "$lib/components/ui/button/button.svelte";
+	import EmptyState from "$lib/components/ui/empty-state/empty-state.svelte";
+	import Empty from "$lib/components/ui/empty/empty.svelte";
+	import SavingsGoalBucket from "$lib/components/ui/savings-goal-bucket/savings-goal-bucket.svelte";
+	import SubscriptionCard from "$lib/components/ui/subscription-card/subscription-card.svelte";
   import { budget } from "$lib/shared.svelte";
+	import { CalendarSync, Target, CirclePercent } from "lucide-svelte";
 
-  let allocations = budget.current["Allocations"];
-  let accounts = budget.current["Accounts"];
+  let allocations = $derived(budget.current["Allocations"]);
+  let savingsGoals = $derived(allocations.filter(allocation => allocation['Type'] === "Fixed"));
+  let subscriptions = $derived(allocations.filter(allocation => allocation['Type'] === "Subscription"));
+  let percentAllocations = $derived(allocations.filter(allocation => allocation['Type'] === "Percentage"));
+  let accounts = $derived(budget.current["Accounts"]);
 
   let name = $state("");
   let type = $state<"Fixed" | "Percentage" | "Subscription">("Fixed");
@@ -53,10 +62,12 @@
       Account: account
     };
 
+    console.log(budget.current["Allocations"]);
     budget.current = {
       ...budget.current,
       Allocations: [...allocations, allocation]
     };
+    console.log(budget.current["Allocations"]);
 
     allocations = budget.current["Allocations"];
 
@@ -138,3 +149,223 @@
 </div>
 
 <Button onclick={addAllocation}>Add Allocation</Button>
+
+<br/>
+<h2 class="text-3xl text-heading text-center">Savings Goals</h2>
+{#if savingsGoals.length === 0}
+  <EmptyState 
+    icon={Target}
+    title="No Savings Goals"
+    description="Add a savings goal"
+    href="{resolve("/allocations")}"
+  />
+{:else}
+  <br/>
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,128px)]">
+      {#each savingsGoals as savingsGoal}
+        <SavingsGoalBucket goal={savingsGoal} />
+      {/each}
+    </div>
+  </div>
+  <br/>
+{/if}
+
+<br/>
+<h2 class="text-3xl text-heading text-center">Subscriptions</h2>
+{#if subscriptions.length === 0}
+  <EmptyState 
+    icon={CalendarSync}
+    title="No Subscriptions"
+    description="Add a subscription"
+    href="{resolve("/allocations")}"
+  />
+{:else}
+  <br/>
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,320px)]">
+      {#each subscriptions as subscription}
+        <SubscriptionCard subscription={subscription} />
+      {/each}
+    </div>
+  </div>
+  <br/>
+{/if}
+
+<br/>
+<h2 class="text-3xl text-heading text-center">Percent-Based Allocations</h2>
+{#if percentAllocations.length === 0}
+  <EmptyState 
+    icon={CirclePercent}
+    title="No Percentage-based Allocations"
+    description="Add a percentage-based allocation"
+    href="{resolve("/allocations")}"
+  />
+{:else}
+<div class="max-w-6xl mx-auto px-4 mt-6">
+  <div
+    class="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm"
+  >
+    <!-- Header -->
+    <div
+      class="flex items-center justify-between border-b border-border/60 px-6 py-4 bg-muted/30"
+    >
+      <div>
+        <h3 class="text-lg font-semibold text-card-foreground">
+          Percentage Allocations
+        </h3>
+        <p class="text-sm text-muted-foreground">
+          Recurring income distribution rules
+        </p>
+      </div>
+
+      <div
+        class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+      >
+        {percentAllocations.length}
+        {percentAllocations.length === 1 ? "allocation" : "allocations"}
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b border-border/60 bg-muted/20">
+            <th
+              class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
+              Name
+            </th>
+
+            <th
+              class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
+              Allocation
+            </th>
+
+            <th
+              class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
+              Account
+            </th>
+
+            <th
+              class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            >
+              Period
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {#each percentAllocations as allocation, index}
+            <tr
+              class="
+                border-b border-border/40
+                transition-all duration-150
+                hover:bg-muted/30
+                last:border-0
+              "
+            >
+              <!-- Name -->
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="
+                      flex h-10 w-10 items-center justify-center
+                      rounded-full bg-primary/10
+                      text-sm font-semibold text-primary
+                    "
+                  >
+                    {allocation["Name"].charAt(0)}
+                  </div>
+
+                  <div>
+                    <div class="font-medium text-foreground">
+                      {allocation["Name"]}
+                    </div>
+
+                    <div class="text-sm text-muted-foreground">
+                      Percentage Allocation
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Allocation -->
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-28">
+                    <div
+                      class="h-2 overflow-hidden rounded-full bg-muted"
+                    >
+                      <div
+                        class="h-full rounded-full bg-primary transition-all"
+                        style={`width: ${Math.min(allocation["Amount"], 100)}%`}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <span class="font-semibold text-foreground">
+                    {allocation["Amount"].toFixed(2)}%
+                  </span>
+                </div>
+              </td>
+
+              <!-- Account -->
+              <td class="px-6 py-4">
+                <div
+                  class="
+                    inline-flex items-center rounded-full
+                    border border-border/60
+                    bg-background px-3 py-1
+                    text-sm font-medium
+                  "
+                >
+                  {allocation["Account"]}
+                </div>
+              </td>
+
+              <!-- Period -->
+              <td class="px-6 py-4">
+                <span
+                  class="
+                    inline-flex items-center rounded-full
+                    bg-muted px-3 py-1
+                    text-sm text-muted-foreground
+                  "
+                >
+                  {allocation["Period"]}
+                </span>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div
+      class="
+        flex items-center justify-between
+        border-t border-border/60
+        bg-muted/20
+        px-6 py-4
+      "
+    >
+      <div class="text-sm text-muted-foreground">
+        Total Percentage Allocation
+      </div>
+
+      <div class="text-lg font-semibold text-foreground">
+        {percentAllocations
+          .reduce((sum, allocation) => sum + allocation["Amount"], 0)
+          .toFixed(2)}%
+      </div>
+    </div>
+  </div>
+</div>
+<br/>
+{/if}
+<br/>

@@ -1,6 +1,12 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
   import Button from "$lib/components/ui/button/button.svelte";
+	import EmptyState from "$lib/components/ui/empty-state/empty-state.svelte";
+	import IncomeSourceCard from "$lib/components/ui/income-source-card/income-source-card.svelte";
   import { budget } from "$lib/shared.svelte";
+	import { BanknoteArrowUp } from "lucide-svelte";
+
+  let income = $derived(budget.current['Funding Sources']);
 
   let name = $state("");
   let fundingType = $state<"Hourly" | "Salary">("Hourly");
@@ -161,7 +167,25 @@
 
 <Button onclick={addFundingSource}>Add Funding Source</Button>
 
-<h2 class="text-2xl mt-8 mb-2">Existing Sources</h2>
+<h2 class="text-3xl text-heading text-center">Income</h2>
+{#if income.length === 0}
+  <EmptyState
+    icon={BanknoteArrowUp}
+    title="No Income Sources"
+    description="Add an income source"
+    href="{resolve("/funding-sources")}"
+  />
+{:else}
+<br/>
+<div class="max-w-7xl mx-auto px-4">
+  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,256px)]">
+    {#each income as source}
+      <IncomeSourceCard source={source} />
+    {/each}
+  </div>
+</div>
+<br/>
+{/if}
 
 <table class="table-auto border-collapse border w-full">
   <thead>
