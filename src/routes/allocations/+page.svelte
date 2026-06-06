@@ -62,12 +62,10 @@
       Account: account
     };
 
-    console.log(budget.current["Allocations"]);
     budget.current = {
       ...budget.current,
       Allocations: [...allocations, allocation]
     };
-    console.log(budget.current["Allocations"]);
 
     allocations = budget.current["Allocations"];
 
@@ -82,7 +80,7 @@
 </script>
 
 <h1 class="text-4xl text-heading mb-4">Allocations</h1>
-<p>This is just a barebones implementation of allocation adding while the UI components are being written. Allocations can currently be deleted over in the testing area </p> 
+<p>This is just a barebones implementation of allocation adding while the UI components are being written. Allocations can currently be deleted over in the testing area. Subscriptions can be deleted, but not edited </p> 
 
 <h2 class="text-2xl mb-2">Add Allocation</h2>
 
@@ -185,7 +183,7 @@
   <div class="max-w-7xl mx-auto px-4">
     <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,320px)]">
       {#each subscriptions as subscription}
-        <SubscriptionCard subscription={subscription} />
+        <SubscriptionCard subscription={subscription} showActions={true} />
       {/each}
     </div>
   </div>
