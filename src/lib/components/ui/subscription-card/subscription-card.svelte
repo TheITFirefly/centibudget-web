@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { formatCurrency, formatDate, formatDays } from '$lib/formatters';
 	import { Pencil, Trash, Check, X, CalendarIcon } from 'lucide-svelte';
-	import Button from '../button/button.svelte';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { budget } from '$lib/shared.svelte';
 	import { Label } from '$lib/components/ui/label';
@@ -143,17 +143,12 @@
 					</Button>
 				{:else}
 					<Dialog.Root bind:open={editOpen}>
-						<Dialog.Trigger>
-							{#snippet child({ props })}
-								<Button
-									{...props}
-									variant="ghost"
-									aria-label="Edit subscription"
-									onclick={openEditDialog}
-								>
-									<Pencil />
-								</Button>
-							{/snippet}
+						<Dialog.Trigger
+							class={buttonVariants({ variant: 'ghost' })}
+							aria-label="Edit goal"
+							onclick={openEditDialog}
+						>
+							<Pencil />
 						</Dialog.Trigger>
 						<Dialog.Content class="sm:max-w-[425px]">
 							<Dialog.Header>

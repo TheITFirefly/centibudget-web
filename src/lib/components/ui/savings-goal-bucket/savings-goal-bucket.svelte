@@ -4,7 +4,7 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -125,12 +125,12 @@
 				</Button>
 			{:else}
 				<Dialog.Root bind:open={editOpen}>
-					<Dialog.Trigger>
-						{#snippet child({ props })}
-							<Button {...props} variant="ghost" aria-label="Edit goal" onclick={openEditDialog}>
-								<Pencil />
-							</Button>
-						{/snippet}
+					<Dialog.Trigger
+						class={buttonVariants({ variant: 'ghost' })}
+						aria-label="Edit goal"
+						onclick={openEditDialog}
+					>
+						<Pencil />
 					</Dialog.Trigger>
 					<Dialog.Content class="sm:max-w-[425px]">
 						<Dialog.Header>

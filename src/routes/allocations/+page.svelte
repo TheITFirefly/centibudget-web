@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
-	import Empty from '$lib/components/ui/empty/empty.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import SavingsGoalBucket from '$lib/components/ui/savings-goal-bucket/savings-goal-bucket.svelte';
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import { budget } from '$lib/shared.svelte';
-	import { CalendarSync, Target, CirclePercent } from 'lucide-svelte';
+	import { CalendarSync, Target, CirclePercent, CirclePlus, CircleX } from 'lucide-svelte';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 
 	let allocations = $derived(budget.current['Allocations']);
 	let savingsGoals = $derived(allocations.filter((allocation) => allocation['Type'] === 'Fixed'));
@@ -18,12 +26,34 @@
 	);
 	let accounts = $derived(budget.current['Accounts']);
 
+	let actionButtonOpen = $state(false);
+	let addDialogOpen = $state(false);
+	let calendarOpen = $state(false);
+	let calendarValue = $state<CalendarDate | undefined>();
+
 	let name = $state('');
 	let type = $state<'Fixed' | 'Percentage' | 'Subscription'>('Fixed');
 	let period = $state('One-time');
 	let amount = $state(0);
 	let account = $state('');
 	let lastPaid = $state<string | null>(null);
+
+	function openAddDialog(selectedType: 'Fixed' | 'Percentage' | 'Subscription') {
+		type = selectedType;
+		name = '';
+		amount = 0;
+		account = '';
+		lastPaid = null;
+		calendarValue = undefined; // add this
+		period =
+			selectedType === 'Subscription'
+				? 'Monthly'
+				: selectedType === 'Percentage'
+					? 'Constant'
+					: 'One-time';
+		actionButtonOpen = false;
+		addDialogOpen = true;
+	}
 
 	// Reactively enforce rules based on Type
 	$effect(() => {
@@ -75,89 +105,16 @@
 			...budget.current,
 			Allocations: [...allocations, allocation]
 		};
-
-		allocations = budget.current['Allocations'];
-
-		// Reset
-		name = '';
-		type = 'Fixed';
-		period = 'One-time';
-		amount = 0;
-		account = '';
-		lastPaid = null;
+		calendarValue = undefined;
+		addDialogOpen = false;
 	}
+
+	const dialogTitle: Record<string, string> = {
+		Fixed: 'Add Savings Goal',
+		Subscription: 'Add Subscription',
+		Percentage: 'Add Percent-Based Allocation'
+	};
 </script>
-
-<h1 class="text-4xl text-heading mb-4">Allocations</h1>
-<p>
-	This is just a barebones implementation of allocation adding while the UI components are being
-	written. Allocations can currently be deleted over in the testing area. Subscriptions can be
-	edited and deleted, as can regular savings goals
-</p>
-
-<h2 class="text-2xl mb-2">Add Allocation</h2>
-
-<div class="grid grid-cols-2 gap-4 mb-6 max-w-xl">
-	<div>
-		<label for="allocation-name-input">Name</label>
-		<input class="border px-2 py-1 w-full" bind:value={name} id="allocation-name-input" />
-	</div>
-
-	<div>
-		<label for="allocation-type-selector">Type</label>
-		<select class="border px-2 py-1 w-full" bind:value={type} id="allocation-type-selector">
-			<option value="Fixed">Fixed</option>
-			<option value="Percentage">Percentage</option>
-			<option value="Subscription">Subscription</option>
-		</select>
-	</div>
-
-	{#if type === 'Subscription'}
-		<div>
-			<label for="subscription-period-selector">Period</label>
-			<select class="border px-2 py-1 w-full" bind:value={period} id="subscription-period-selector">
-				<option>Weekly</option>
-				<option>Biweekly</option>
-				<option>Monthly</option>
-				<option>Yearly</option>
-			</select>
-		</div>
-
-		<div>
-			<label for="subscription-last-paid-selector">Last Paid</label>
-			<input
-				type="date"
-				class="border px-2 py-1 w-full"
-				bind:value={lastPaid}
-				id="subscription-last-paid-selector"
-			/>
-		</div>
-	{/if}
-
-	<div>
-		<label for="allocation-amount-input">Amount</label>
-		<input
-			type="number"
-			class="border px-2 py-1 w-full"
-			bind:value={amount}
-			id="allocation-amount-input"
-		/>
-	</div>
-
-	<div>
-		<label for="allocation-account-selector">Account</label>
-		<select class="border px-2 py-1 w-full" bind:value={account} id="allocation-account-selector">
-			<option value="" disabled>Select account</option>
-			{#each accounts as acc}
-				<option value={acc['Name']}>{acc['Name']}</option>
-			{/each}
-		</select>
-	</div>
-</div>
-
-<Button onclick={addAllocation}>Add Allocation</Button>
-
-<br />
 <h2 class="text-3xl text-heading text-center">Savings Goals</h2>
 {#if savingsGoals.length === 0}
 	<EmptyState
@@ -361,4 +318,120 @@
 	</div>
 	<br />
 {/if}
+<br />
+
+<!-- Add Allocation Dialog -->
+<Dialog.Root bind:open={addDialogOpen}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>{dialogTitle[type]}</Dialog.Title>
+			<Dialog.Description>Fill in the details for your new allocation.</Dialog.Description>
+		</Dialog.Header>
+
+		<div class="grid gap-4 py-4">
+			<div class="grid gap-2">
+				<Label for="allocation-name-input">Name</Label>
+				<Input id="allocation-name-input" bind:value={name} />
+			</div>
+
+			{#if type === 'Subscription'}
+				<div class="grid gap-2">
+					<Label for="subscription-period-selector">Period</Label>
+					<Select.Root type="single" bind:value={period}>
+						<Select.Trigger class="w-full">{period}</Select.Trigger>
+						<Select.Content>
+							<Select.Item value="Weekly">Weekly</Select.Item>
+							<Select.Item value="Biweekly">Biweekly</Select.Item>
+							<Select.Item value="Monthly">Monthly</Select.Item>
+							<Select.Item value="Yearly">Yearly</Select.Item>
+						</Select.Content>
+					</Select.Root>
+				</div>
+
+				<div class="grid gap-2">
+					<Label for="subscription-last-paid-input">Last Paid</Label>
+					<Popover.Root bind:open={calendarOpen}>
+						<Popover.Trigger id="subscription-last-paid-input">
+							{#snippet child({ props })}
+								<Button {...props} variant="outline" class="w-full justify-between font-normal">
+									{lastPaid ? new Date(`${lastPaid}T00:00:00`).toLocaleDateString() : 'Select date'}
+									<CalendarIcon class="size-4" />
+								</Button>
+							{/snippet}
+						</Popover.Trigger>
+						<Popover.Content class="w-auto overflow-hidden p-0" align="start">
+							<Calendar
+								type="single"
+								bind:value={calendarValue}
+								captionLayout="dropdown"
+								onValueChange={(v) => {
+									if (v) {
+										lastPaid = `${v.year}-${String(v.month).padStart(2, '0')}-${String(v.day).padStart(2, '0')}`;
+									}
+									calendarOpen = false;
+								}}
+								minValue={today(getLocalTimeZone()).subtract({ years: 2 })}
+								maxValue={today(getLocalTimeZone())}
+							/>
+						</Popover.Content>
+					</Popover.Root>
+				</div>
+			{/if}
+
+			<div class="grid gap-2">
+				<Label for="allocation-amount-input">
+					{type === 'Percentage' ? 'Percentage (%)' : 'Amount'}
+				</Label>
+				<Input id="allocation-amount-input" type="number" bind:value={amount} />
+			</div>
+
+			<div class="grid gap-2">
+				<Label for="allocation-account-selector">Account</Label>
+				<Select.Root type="single" bind:value={account}>
+					<Select.Trigger class="w-full">{account || 'Select an account'}</Select.Trigger>
+					<Select.Content>
+						{#each accounts as acc}
+							<Select.Item value={acc['Name']}>{acc['Name']}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+		</div>
+
+		<Dialog.Footer>
+			<Dialog.Close>
+				<Button variant="outline">Cancel</Button>
+			</Dialog.Close>
+			<Button onclick={addAllocation}>Add</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- FAB -->
+<div class="fixed bottom-6 right-6 z-50">
+	<DropdownMenu.Root bind:open={actionButtonOpen}>
+		<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'lg' })}>
+			{#if actionButtonOpen}
+				<CircleX class="size-10"/>
+			{:else}
+				<CirclePlus class="size-10"/>
+			{/if}
+		</DropdownMenu.Trigger>
+
+		<DropdownMenu.Content class="min-w-56">
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => openAddDialog('Fixed')}>Add Savings Goal</DropdownMenu.Item
+			>
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => openAddDialog('Subscription')}>Add Subscription</DropdownMenu.Item
+			>
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => openAddDialog('Percentage')}>Add Percent-Based Allocation</DropdownMenu.Item
+			>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
+</div>
 <br />
