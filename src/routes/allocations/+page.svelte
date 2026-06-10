@@ -9,9 +9,7 @@
 	import { CalendarSync, Target, CirclePercent } from 'lucide-svelte';
 
 	let allocations = $derived(budget.current['Allocations']);
-	let savingsGoals = $derived(
-    allocations.filter((allocation) => allocation['Type'] === 'Fixed')
-  );
+	let savingsGoals = $derived(allocations.filter((allocation) => allocation['Type'] === 'Fixed'));
 	let subscriptions = $derived(
 		allocations.filter((allocation) => allocation['Type'] === 'Subscription')
 	);
@@ -59,6 +57,11 @@
 			return;
 		}
 
+		if (allocations.some((a) => a['Name'] === name.trim())) {
+			alert('An allocation with that name already exists');
+			return;
+		}
+
 		const allocation = {
 			Name: name,
 			Type: type,
@@ -89,7 +92,7 @@
 <p>
 	This is just a barebones implementation of allocation adding while the UI components are being
 	written. Allocations can currently be deleted over in the testing area. Subscriptions can be
-	edited and deleted
+	edited and deleted, as can regular savings goals
 </p>
 
 <h2 class="text-2xl mb-2">Add Allocation</h2>
@@ -168,7 +171,7 @@
 	<div class="max-w-7xl mx-auto px-4">
 		<div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,128px)]">
 			{#each savingsGoals as savingsGoal}
-				<SavingsGoalBucket goal={savingsGoal} />
+				<SavingsGoalBucket goal={savingsGoal} showActions={true} />
 			{/each}
 		</div>
 	</div>

@@ -1,48 +1,189 @@
-<script>
-  import { budget } from "$lib/shared.svelte";
-  import { formatCurrency } from "$lib/formatters";
+<script lang="ts">
+	import { budget } from '$lib/shared.svelte';
+	import { formatCurrency } from '$lib/formatters';
+	import * as Card from '$lib/components/ui/card/index.js';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Check, X, Pencil, Trash } from 'lucide-svelte';
 
-  let { goal } = $props();
+	let { goal, showActions = false } = $props();
 
-  const accounts = $derived(budget.current["Accounts"]);
+	// Edit state
+	let editOpen = $state(false);
+	let confirmDelete = $state(false);
+	let editName = $state('');
+	let editAmount = $state(0);
+	let editAccount = $state('');
 
-  const balance = $derived(
-    accounts.find(acc => acc["Name"] === goal["Account"])?.["Balance"] ?? 0
-  );
+	const accounts = $derived(budget.current['Accounts']);
+	const balance = $derived(
+		accounts.find((acc) => acc['Name'] === goal['Account'])?.['Balance'] ?? 0
+	);
+	const progress = $derived.by(() => {
+		const total = goal['Amount'];
+		if (!total) return 0;
+		return Math.min(100, Math.round((balance / total) * 100));
+	});
 
-  const progress = $derived.by(() => {
-    const total = goal["Amount"];
-    if (!total) return 0;
+	const formattedBalance = $derived(formatCurrency(balance));
+	const formattedTotal = $derived(formatCurrency(goal['Amount']));
+	const isComplete = $derived(progress >= 100);
 
-    return Math.min(100, Math.round((balance / total) * 100));
-  });
+	// Radial chart math
+	const radius = 40;
+	const circumference = 2 * Math.PI * radius;
+	const strokeDashoffset = $derived(circumference - (progress / 100) * circumference);
 
-  const formattedBalance = $derived(formatCurrency(balance));
-  const formattedTotal = $derived(formatCurrency(goal["Amount"]));
+	function openEditDialog() {
+		editName = goal['Name'];
+		editAmount = goal['Amount'];
+		editAccount = goal['Account'];
+		editOpen = true;
+	}
+
+	function saveGoal() {
+		budget.current = {
+			...budget.current,
+			Allocations: budget.current['Allocations'].map((g) =>
+				g['Name'] === goal['Name']
+					? { ...g, Name: editName, Amount: Number(editAmount), Account: editAccount }
+					: g
+			)
+		};
+		editOpen = false;
+	}
+
+	function deleteGoal() {
+		if (!confirmDelete) {
+			confirmDelete = true;
+			return;
+		}
+		budget.current = {
+			...budget.current,
+			Allocations: budget.current['Allocations'].filter((g) => g['Name'] !== goal['Name'])
+		};
+	}
 </script>
 
-<div class="h-40 border rounded-lg flex flex-col overflow-hidden transition-all duration-300">
-  
-  <!-- Header -->
-  <div class="text-center font-semibold py-2 border-b">
-    {goal["Name"]}
-  </div>
+<Card.Root class="flex flex-col items-center py-4 gap-2">
+	<Card.Header class="pb-0">
+		<Card.Title class="text-center">{goal['Name']}</Card.Title>
+	</Card.Header>
 
-  <!-- Bucket -->
-  <div class="relative flex-1 overflow-hidden">
-    <div
-      class="absolute bottom-0 left-0 w-full bg-primary transition-all duration-300 rounded-t-md"
-      class:animate-pulse-slow={progress === 100}
-      style="height: {progress}%"
-    ></div>
-  </div>
+	<Card.Content class="flex flex-col items-center gap-1 pb-0">
+		<!-- Radial chart -->
+		<div class="relative w-32 h-32">
+			<svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+				<circle
+					cx="50"
+					cy="50"
+					r={radius}
+					fill="none"
+					stroke="currentColor"
+					stroke-width="10"
+					class="text-muted"
+				/>
+				<circle
+					cx="50"
+					cy="50"
+					r={radius}
+					fill="none"
+					stroke="currentColor"
+					stroke-width="10"
+					stroke-linecap="round"
+					stroke-dasharray={circumference}
+					stroke-dashoffset={strokeDashoffset}
+					class={isComplete ? 'text-primary animate-pulse-slow' : 'text-primary'}
+					style="transition: stroke-dashoffset 0.5s ease"
+				/>
+			</svg>
+			<div class="absolute inset-0 flex items-center justify-center">
+				<span class="text-lg font-semibold">{progress}%</span>
+			</div>
+		</div>
 
-  <!-- Footer -->
-  <div class="text-center text-sm py-2 border-t">
-    {formattedBalance}
-    /
-    {formattedTotal}
-    ({progress}%)
-  </div>
+		<p class="text-sm text-muted-foreground">
+			{formattedBalance} <span class="text-foreground font-medium">/</span>
+			{formattedTotal}
+		</p>
+	</Card.Content>
 
-</div>
+	<Card.Footer class="gap-2 pt-2">
+		{#if showActions}
+			<!-- Edit -->
+			{#if confirmDelete}
+				<Button
+					variant="ghost"
+					aria-label="Cancel deletion"
+					onclick={() => (confirmDelete = false)}
+				>
+					<X />
+				</Button>
+			{:else}
+				<Dialog.Root bind:open={editOpen}>
+					<Dialog.Trigger>
+						{#snippet child({ props })}
+							<Button {...props} variant="ghost" aria-label="Edit goal" onclick={openEditDialog}>
+								<Pencil />
+							</Button>
+						{/snippet}
+					</Dialog.Trigger>
+					<Dialog.Content class="sm:max-w-[425px]">
+						<Dialog.Header>
+							<Dialog.Title>Edit Goal</Dialog.Title>
+							<Dialog.Description>Update your savings goal details.</Dialog.Description>
+						</Dialog.Header>
+						<div class="grid gap-4 py-4">
+							<div class="grid gap-2">
+								<Label for="goal-name">Name (Cannot be changed)</Label>
+								<Input id="goal-name" readonly bind:value={editName} />
+							</div>
+							<div class="grid gap-2">
+								<Label for="goal-amount">Target Amount</Label>
+								<Input id="goal-amount" type="number" bind:value={editAmount} />
+							</div>
+							<div class="grid gap-2">
+								<Label for="goal-account">Linked Account</Label>
+								<Select.Root type="single" bind:value={editAccount}>
+									<Select.Trigger class="w-full">
+										{editAccount || 'Select an account'}
+									</Select.Trigger>
+									<Select.Content>
+										{#each accounts as acc}
+											<Select.Item value={acc['Name']}>{acc['Name']}</Select.Item>
+										{/each}
+									</Select.Content>
+								</Select.Root>
+							</div>
+						</div>
+						<Dialog.Footer>
+							<Dialog.Close>
+								<Button variant="outline">Cancel</Button>
+							</Dialog.Close>
+							<Button onclick={saveGoal}>Save</Button>
+						</Dialog.Footer>
+					</Dialog.Content>
+				</Dialog.Root>
+			{/if}
+
+			<Separator orientation="vertical" class="h-6" />
+
+			<!-- Delete -->
+			<Button
+				variant="ghost"
+				aria-label={confirmDelete ? 'Confirm deletion' : 'Delete goal'}
+				onclick={deleteGoal}
+			>
+				{#if confirmDelete}
+					<Check />
+				{:else}
+					<Trash />
+				{/if}
+			</Button>
+		{/if}
+	</Card.Footer>
+</Card.Root>
