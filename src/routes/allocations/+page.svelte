@@ -3,18 +3,12 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import SavingsGoalBucket from '$lib/components/ui/savings-goal-bucket/savings-goal-bucket.svelte';
+	import SavingsGoalCard from '$lib/components/ui/savings-goal-card/savings-goal-card.svelte';
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import { budget } from '$lib/shared.svelte';
 	import { CalendarSync, Target, CirclePercent, CirclePlus, CircleX } from 'lucide-svelte';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { CalendarIcon } from 'lucide-svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
+	import AddAllocationDialog from '$lib/components/ui/add-allocation-dialog/add-allocation-dialog.svelte';
 
 	let allocations = $derived(budget.current['Allocations']);
 	let savingsGoals = $derived(allocations.filter((allocation) => allocation['Type'] === 'Fixed'));
@@ -115,6 +109,8 @@
 		Percentage: 'Add Percent-Based Allocation'
 	};
 </script>
+
+<AddAllocationDialog bind:open={addDialogOpen} bind:type />
 <h2 class="text-3xl text-heading text-center">Savings Goals</h2>
 {#if savingsGoals.length === 0}
 	<EmptyState
@@ -126,9 +122,9 @@
 {:else}
 	<br />
 	<div class="max-w-7xl mx-auto px-4">
-		<div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,128px)]">
+		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,128px)]">
 			{#each savingsGoals as savingsGoal}
-				<SavingsGoalBucket goal={savingsGoal} showActions={true} />
+				<SavingsGoalCard goal={savingsGoal} showActions={true} />
 			{/each}
 		</div>
 	</div>
@@ -147,7 +143,7 @@
 {:else}
 	<br />
 	<div class="max-w-7xl mx-auto px-4">
-		<div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,320px)]">
+		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,320px)]">
 			{#each subscriptions as subscription}
 				<SubscriptionCard {subscription} showActions={true} />
 			{/each}
@@ -320,101 +316,13 @@
 {/if}
 <br />
 
-<!-- Add Allocation Dialog -->
-<Dialog.Root bind:open={addDialogOpen}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>{dialogTitle[type]}</Dialog.Title>
-			<Dialog.Description>Fill in the details for your new allocation.</Dialog.Description>
-		</Dialog.Header>
-
-		<div class="grid gap-4 py-4">
-			<div class="grid gap-2">
-				<Label for="allocation-name-input">Name</Label>
-				<Input id="allocation-name-input" bind:value={name} />
-			</div>
-
-			{#if type === 'Subscription'}
-				<div class="grid gap-2">
-					<Label for="subscription-period-selector">Period</Label>
-					<Select.Root type="single" bind:value={period}>
-						<Select.Trigger class="w-full">{period}</Select.Trigger>
-						<Select.Content>
-							<Select.Item value="Weekly">Weekly</Select.Item>
-							<Select.Item value="Biweekly">Biweekly</Select.Item>
-							<Select.Item value="Monthly">Monthly</Select.Item>
-							<Select.Item value="Yearly">Yearly</Select.Item>
-						</Select.Content>
-					</Select.Root>
-				</div>
-
-				<div class="grid gap-2">
-					<Label for="subscription-last-paid-input">Last Paid</Label>
-					<Popover.Root bind:open={calendarOpen}>
-						<Popover.Trigger id="subscription-last-paid-input">
-							{#snippet child({ props })}
-								<Button {...props} variant="outline" class="w-full justify-between font-normal">
-									{lastPaid ? new Date(`${lastPaid}T00:00:00`).toLocaleDateString() : 'Select date'}
-									<CalendarIcon class="size-4" />
-								</Button>
-							{/snippet}
-						</Popover.Trigger>
-						<Popover.Content class="w-auto overflow-hidden p-0" align="start">
-							<Calendar
-								type="single"
-								bind:value={calendarValue}
-								captionLayout="dropdown"
-								onValueChange={(v) => {
-									if (v) {
-										lastPaid = `${v.year}-${String(v.month).padStart(2, '0')}-${String(v.day).padStart(2, '0')}`;
-									}
-									calendarOpen = false;
-								}}
-								minValue={today(getLocalTimeZone()).subtract({ years: 2 })}
-								maxValue={today(getLocalTimeZone())}
-							/>
-						</Popover.Content>
-					</Popover.Root>
-				</div>
-			{/if}
-
-			<div class="grid gap-2">
-				<Label for="allocation-amount-input">
-					{type === 'Percentage' ? 'Percentage (%)' : 'Amount'}
-				</Label>
-				<Input id="allocation-amount-input" type="number" bind:value={amount} />
-			</div>
-
-			<div class="grid gap-2">
-				<Label for="allocation-account-selector">Account</Label>
-				<Select.Root type="single" bind:value={account}>
-					<Select.Trigger class="w-full">{account || 'Select an account'}</Select.Trigger>
-					<Select.Content>
-						{#each accounts as acc}
-							<Select.Item value={acc['Name']}>{acc['Name']}</Select.Item>
-						{/each}
-					</Select.Content>
-				</Select.Root>
-			</div>
-		</div>
-
-		<Dialog.Footer>
-			<Dialog.Close>
-				<Button variant="outline">Cancel</Button>
-			</Dialog.Close>
-			<Button onclick={addAllocation}>Add</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- FAB -->
 <div class="fixed bottom-6 right-6 z-50">
 	<DropdownMenu.Root bind:open={actionButtonOpen}>
 		<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'lg' })}>
 			{#if actionButtonOpen}
-				<CircleX class="size-10"/>
+				<CircleX class="size-10" />
 			{:else}
-				<CirclePlus class="size-10"/>
+				<CirclePlus class="size-10" />
 			{/if}
 		</DropdownMenu.Trigger>
 

@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
   import * as Empty from "$lib/components/ui/empty/index.js";
   import Button from "$lib/components/ui/button/button.svelte";
-  import SavingsGoalBucket from '$lib/components/ui/savings-goal-bucket/savings-goal-bucket.svelte';
+  import SavingsGoalCard from '$lib/components/ui/savings-goal-card/savings-goal-card.svelte';
   import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
   import IncomeSourceCard from '$lib/components/ui/income-source-card/income-source-card.svelte';
   import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
@@ -70,7 +70,7 @@
 <div class="max-w-7xl mx-auto px-4">
   <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,128px)]">
     {#each savingsGoals as savingsGoal}
-      <SavingsGoalBucket goal={savingsGoal} />
+      <SavingsGoalCard goal={savingsGoal} />
     {/each}
   </div>
 </div>
