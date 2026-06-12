@@ -62,27 +62,20 @@
 	}
 </script>
 
-<Card.Root class="flex flex-col items-center py-4 gap-2">
-	<Card.Header class="pb-0">
-		<Card.Title class="text-center">{percentAllocation['Name']}</Card.Title>
+<Card.Root>
+	<Card.Header>
+		<Card.Title class="text-center">
+			{percentAllocation['Name']}
+		</Card.Title>
 	</Card.Header>
 
-	<Card.Content class="flex flex-col items-center gap-2 pb-0">
-		<div class="text-center">
-			<div class="text-3xl font-bold">
-				{percentAllocation['Amount']}%
-			</div>
-		</div>
-
-		<div class="text-center">
-			<p class="text-sm text-muted-foreground">Linked Account</p>
-			<p class="font-medium">
-				{percentAllocation['Account']}
-			</p>
-		</div>
+	<Card.Content class="text-center">
+		<p class="text-3xl font-bold">{percentAllocation['Amount']}%</p>
+		<p class="text-sm text-muted-foreground">Linked Account</p>
+		<p class="font-medium">{percentAllocation['Account']}</p>
 	</Card.Content>
 
-	<Card.Footer class="gap-2 pt-2">
+	<Card.Footer>
 		{#if showActions}
 			{#if confirmDelete}
 				<Button variant="ghost" onclick={() => (confirmDelete = false)}>

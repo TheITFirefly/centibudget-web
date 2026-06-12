@@ -3,6 +3,7 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
 	import SavingsGoalCard from '$lib/components/ui/savings-goal-card/savings-goal-card.svelte';
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import PercentageCard from '$lib/components/ui/percentage-card/percentage-card.svelte';
@@ -163,8 +164,9 @@
 		href={resolve('/allocations')}
 	/>
 {:else}
-	<div class="max-w-7xl mx-auto px-4">
-		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,320px)]">
+  <br />
+	<div class="max-w-7xl mx-auto">
+		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,128px)]">
 			{#each percentAllocations as percentAllocation}
 				<PercentageCard {percentAllocation} showActions={true} />
 			{/each}
@@ -174,6 +176,7 @@
 {/if}
 <br />
 
+<!-- ActionButton -->
 <div class="fixed bottom-6 right-6 z-50">
 	<DropdownMenu.Root bind:open={actionButtonOpen}>
 		<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'lg' })}>
@@ -201,3 +204,15 @@
 	</DropdownMenu.Root>
 </div>
 <br />
+
+<Card.Root>
+ <Card.Header>
+  <Card.Title>Card Title</Card.Title>
+ </Card.Header>
+ <Card.Content>
+  <p>Card Content</p>
+ </Card.Content>
+ <Card.Footer>
+  <p>Card Footer</p>
+ </Card.Footer>
+</Card.Root>

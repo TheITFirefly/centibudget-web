@@ -69,8 +69,8 @@
 	}
 </script>
 
-<Card.Root class="flex flex-col items-center py-4 gap-2">
-	<Card.Header class="pb-0">
+<Card.Root class="overflow-hidden">
+	<Card.Header>
 		<Card.Title class="text-center">{goal['Name']}</Card.Title>
 	</Card.Header>
 

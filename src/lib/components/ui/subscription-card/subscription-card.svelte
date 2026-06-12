@@ -99,24 +99,24 @@
 </script>
 
 <div
-	class="w-80 h-24 border rounded-lg flex overflow-hidden transition-all duration-300 hover:shadow-sm"
+	class="w-80 h-24 border rounded-lg flex overflow-hidden transition-all duration-300 hover:shadow-sm bg-card mx-1"
 >
 	<!-- Left: Name -->
 	<div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">
 		{subscription['Name']}
 	</div>
 
-	<Separator orientation="vertical" />
+	<Separator orientation="vertical" class="mx-1" />
 
 	<!-- Middle: Amount -->
 	<div class="w-24 flex items-center justify-center text-sm font-medium">
 		{formattedAmount}
 	</div>
 
-	<Separator orientation="vertical" />
+	<Separator orientation="vertical" class="mx-1" />
 
 	<!-- Right: Date + Days -->
-	<div class="w-28 flex flex-col items-center justify-center text-xs">
+	<div class="w-33 flex flex-col items-center justify-center text-xs">
 		<div>
 			{formattedDate}
 		</div>
@@ -128,10 +128,11 @@
 		</div>
 	</div>
 
+	<!-- Additional Right: Action Buttons -->
 	{#if showActions}
-		<Separator orientation="vertical" />
+		<Separator orientation="vertical" class="mx-1" />
 
-		<div class="w-28 flex flex-col items-center justify-center text-xs">
+		<div class="w-28 flex flex-col items-center justify-center text-xs mx-1">
 			<div>
 				{#if confirmDelete}
 					<Button

@@ -13,7 +13,7 @@
 </script>
 
 <NavigationMenu.Root
-	class="bg-background fixed top-0 shadow-md w-full max-w-full hidden sm:flex py-1"
+  class="bg-background fixed top-0 shadow-md w-full max-w-full hidden sm:flex py-1 z-50"
 >
 	<NavigationMenu.List class="flex items-center gap-2">
 		<NavigationMenu.Item>
