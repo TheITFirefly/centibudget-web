@@ -10,7 +10,7 @@
   const formattedBalance = $derived(formatCurrency(balance));
 </script>
 
-<div class="h-32 w-40 border rounded-lg flex flex-col overflow-hidden transition-all duration-300">
+<div class="h-32 w-40 border rounded-lg flex flex-col overflow-hidden transition-all duration-300 bg-card">
   
   <!-- Header -->
   <div class="text-center font-semibold py-2 border-b">
