@@ -15,6 +15,7 @@
 	let editOpen = $state(false);
 	let confirmDelete = $state(false);
 
+	let editName = $state('');
 	let editAmount = $state(0);
 	let editAccount = $state('');
 
@@ -25,6 +26,7 @@
 	);
 
 	function openEditDialog() {
+		editName = percentAllocation['Name'];
 		editAmount = percentAllocation['Amount'];
 		editAccount = percentAllocation['Account'];
 		editOpen = true;
@@ -83,24 +85,34 @@
 				</Button>
 			{:else}
 				<Dialog.Root bind:open={editOpen}>
-					<Dialog.Trigger class={buttonVariants({ variant: 'ghost' })} onclick={openEditDialog}>
+					<Dialog.Trigger
+						class={buttonVariants({ variant: 'ghost' })}
+						aria-label="Edit percentage allocation"
+						onclick={openEditDialog}
+					>
 						<Pencil />
 					</Dialog.Trigger>
-
 					<Dialog.Content class="sm:max-w-[425px]">
 						<Dialog.Header>
 							<Dialog.Title>Edit Percentage Allocation</Dialog.Title>
+							<Dialog.Description>Update Percentage Allocation Details</Dialog.Description>
 						</Dialog.Header>
 
 						<div class="grid gap-4 py-4">
 							<div class="grid gap-2">
-								<Label>Name</Label>
-								<Input readonly value={percentAllocation['Name']} />
+								<Label for="allocation-name">Name (Cannot be changed)</Label>
+								<Input id="allocation-name" readonly bind:value={editName} />
 							</div>
 
 							<div class="grid gap-2">
-								<Label>Percentage</Label>
-								<Input type="number" min="0" max="100" bind:value={editAmount} />
+								<Label for="allocation-percent">Percentage</Label>
+								<Input
+									id="allocation-percent"
+									type="number"
+									min="0"
+									max="100"
+									bind:value={editAmount}
+								/>
 							</div>
 
 							<div class="grid gap-2">

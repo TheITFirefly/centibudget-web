@@ -39,7 +39,7 @@ const formattedDays = $derived(formatDays(daysLeft));
 
 </script>
 
-<div class="w-64 h-24 border rounded-lg flex overflow-hidden transition-all duration-300 hover:shadow-sm">
+<div class="w-64 h-24 border rounded-lg flex overflow-hidden transition-all duration-300 hover:shadow-sm bg-card">
   
   <!-- Left -->
   <div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">

@@ -204,15 +204,3 @@
 	</DropdownMenu.Root>
 </div>
 <br />
-
-<Card.Root>
- <Card.Header>
-  <Card.Title>Card Title</Card.Title>
- </Card.Header>
- <Card.Content>
-  <p>Card Content</p>
- </Card.Content>
- <Card.Footer>
-  <p>Card Footer</p>
- </Card.Footer>
-</Card.Root>
