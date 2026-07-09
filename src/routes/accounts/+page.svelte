@@ -1,86 +1,69 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-  import Button from "$lib/components/ui/button/button.svelte";
-  import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
-  import { budget } from "$lib/shared.svelte";
-	import EmptyState from "$lib/components/ui/empty-state/empty-state.svelte";
-  import { PiggyBank } from "lucide-svelte";
-  
-  let accounts = $derived(budget.current['Accounts']);
-  let newAccountName = $state("");
-  let newAccountBalance = $state(0);
 
-  function addAccount() {
-    if (!newAccountName.trim()) {
-      alert("Account name is required");
-      return;
-    }
+	import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
+	import AddAccountDialog from '$lib/components/ui/add-account-dialog/add-account-dialog.svelte';
+	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 
-    const exists = accounts.some(acc => acc["Name"] === newAccountName);
-    if (exists) {
-      alert("An account with this name already exists");
-      return;
-    }
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
-    budget.current = {
-      ...budget.current,
-      Accounts: [...accounts, { Name: newAccountName, Balance: Number(newAccountBalance), Transactions: [] }]
-    };
+	import { budget } from '$lib/shared.svelte';
 
-    newAccountName = "";
-    newAccountBalance = 0;
-  }
+	import { PiggyBank, CirclePlus, CircleX } from 'lucide-svelte';
+
+	let accounts = $derived(budget.current['Accounts']);
+
+	let addDialogOpen = $state(false);
+	let actionButtonOpen = $state(false);
 </script>
 
-<h1 class="text-4xl text-heading mb-4">Accounts</h1>
+<AddAccountDialog bind:open={addDialogOpen} />
 
-<p>This is just a barebones implementation of account adding while the UI components are being written. Accounts can currently be deleted over in the testing area </p> 
+<h2 class="text-3xl text-heading text-center">Existing Accounts</h2>
 
-<h2 class="text-2xl mb-2">Add Account</h2>
-
-<div class="flex gap-3 items-end mb-6">
-  <div class="flex flex-col">
-    <label class="text-sm" for="account-name-input">Account Name</label>
-    <input
-      class="border px-2 py-1"
-      bind:value={newAccountName}
-      placeholder="Checking"
-      id="account-name-input"
-    />
-  </div>
-
-  <div class="flex flex-col">
-    <label class="text-sm" for="starting-balance-input">Starting Balance</label>
-    <input
-      type="number"
-      class="border px-2 py-1"
-      bind:value={newAccountBalance}
-      id="starting-balance-input"
-    />
-  </div>
-
-  <Button onclick={addAccount}>
-    Add
-  </Button>
-</div>
-
-<h2 class="text-2xl mb-2 text-center">Existing Accounts</h2>
 {#if accounts.length === 0}
-  <EmptyState
-    icon={PiggyBank}
-    title="No Existing Accounts"
-    description="Add an account"
-    href="{resolve("/accounts")}"
-  />
+	<EmptyState
+		icon={PiggyBank}
+		title="No Existing Accounts"
+		description="Add an account"
+		href={resolve('/accounts')}
+	/>
 {:else}
-<br/>
-<div class="max-w-7xl mx-auto px-4">
-  <div class="grid gap-6 justify-center [grid-template-columns:repeat(auto-fit,160px)]">
-    {#each accounts as account}
-      <AccountCard account={account} />
-    {/each}
-  </div>
-</div>
-<br/>
+	<br />
+	<div class="max-w-7xl mx-auto px-4">
+		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,160px)]">
+			{#each accounts as account}
+				<AccountCard {account} />
+			{/each}
+		</div>
+	</div>
+	<br />
 {/if}
 
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6 z-50">
+	<DropdownMenu.Root bind:open={actionButtonOpen}>
+		<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'lg' })}>
+			{#if actionButtonOpen}
+				<CircleX class="size-10" />
+			{:else}
+				<CirclePlus class="size-10" />
+			{/if}
+		</DropdownMenu.Trigger>
+
+		<DropdownMenu.Content class="min-w-56">
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => {
+					actionButtonOpen = false;
+					addDialogOpen = true;
+				}}
+			>
+				Add Account
+			</DropdownMenu.Item>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
+</div>
+
+<br />
