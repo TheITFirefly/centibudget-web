@@ -4,7 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import SavingsGoalCard from '$lib/components/ui/savings-goal-card/savings-goal-card.svelte';
 	import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
-	import IncomeSourceCard from '$lib/components/ui/income-source-card/income-source-card.svelte';
+	import FundingSourceCard from '$lib/components/ui/funding-source-card/funding-source-card.svelte';
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
@@ -52,7 +52,7 @@
 	<div class="max-w-7xl mx-auto px-4">
 		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,256px)]">
 			{#each income as source}
-				<IncomeSourceCard {source} />
+				<FundingSourceCard {source} />
 			{/each}
 		</div>
 	</div>
