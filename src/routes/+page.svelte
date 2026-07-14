@@ -37,6 +37,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Dashboard - CentiBudget</title>
+</svelte:head>
+
 <h1 class="text-4xl text-heading text-center">Dashboard</h1>
 
 <h2 class="text-3xl text-heading text-center">Income</h2>

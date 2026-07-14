@@ -18,6 +18,10 @@
 	let actionButtonOpen = $state(false);
 </script>
 
+<svelte:head>
+	<title>Accounts - CentiBudget</title>
+</svelte:head>
+
 <AddAccountDialog bind:open={addDialogOpen} />
 
 <h2 class="text-3xl text-heading text-center">Existing Accounts</h2>

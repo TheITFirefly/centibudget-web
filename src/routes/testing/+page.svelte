@@ -39,6 +39,11 @@
     }
   }
 </script>
+
+<svelte:head>
+	<title>Testing Area - CentiBudget</title>
+</svelte:head>
+
 <div class="p-2">
 <p>Hey there! If you found this, the fancy UI isn't quite finished yet, but it is being worked on.</p>
 <p>Right now this page is for testing if your budget matches the known schema, and deleting stuff from your budget</p>

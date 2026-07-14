@@ -112,6 +112,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Allocations - CentiBudget</title>
+</svelte:head>
+
 <AddAllocationDialog bind:open={addDialogOpen} bind:type />
 <h2 class="text-3xl text-heading text-center">Savings Goals</h2>
 {#if savingsGoals.length === 0}

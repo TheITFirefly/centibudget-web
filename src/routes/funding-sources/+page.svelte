@@ -18,6 +18,10 @@
 	let actionButtonOpen = $state(false);
 </script>
 
+<svelte:head>
+	<title>Funding Sources - CentiBudget</title>
+</svelte:head>
+
 <AddFundingSourceDialog bind:open={addDialogOpen} />
 
 <h1 class="text-4xl text-heading mb-4">Funding Sources</h1>
