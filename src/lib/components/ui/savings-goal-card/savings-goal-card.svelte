@@ -20,6 +20,13 @@
 	let editAccount = $state('');
 
 	const accounts = $derived(budget.current['Accounts']);
+	//remove special characters, lowercase (slugify)
+	const goalNameId = $derived(
+		`goal-title-${goal['Name']
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-|-$/g, '')}`
+	);
 	const balance = $derived(
 		accounts.find((acc) => acc['Name'] === goal['Account'])?.['Balance'] ?? 0
 	);
@@ -71,13 +78,22 @@
 
 <Card.Root class="overflow-hidden">
 	<Card.Header>
-		<Card.Title class="text-center">{goal['Name']}</Card.Title>
+		<Card.Title id={goalNameId} class="text-center">{goal['Name']}</Card.Title>
 	</Card.Header>
 
 	<Card.Content class="flex flex-col items-center gap-1 pb-0">
+		<progress
+			class="sr-only"
+			value={progress}
+			max="100"
+			aria-labelledby={goalNameId}
+			aria-valuetext={`${formattedBalance} saved of ${formattedTotal} (${progress}% complete)`}
+		>
+			{progress}%
+		</progress>
 		<!-- Radial chart -->
 		<div class="relative w-32 h-32">
-			<svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
+			<svg viewBox="0 0 100 100" class="w-full h-full -rotate-90" aria-hidden="true">
 				<circle
 					cx="50"
 					cy="50"
