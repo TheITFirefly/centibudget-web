@@ -24,6 +24,14 @@
 	let editLastPaid = $state('');
 	let calendarValue = $state<CalendarDate | undefined>();
 
+	//remove special characters, lowercase (slugify)
+	const subscriptionNameId = $derived(
+		`subscription-title-${subscription['Name']
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-|-$/g, '')}`
+	);
+
 	function calculateNextPayDate(lastPaidDate: string, period: string): Date {
 		const date = new Date(`${lastPaidDate}T00:00:00`);
 		const next = new Date(date);
@@ -98,37 +106,39 @@
 	const formattedDays = $derived(formatDays(daysLeft));
 </script>
 
-<div
+<article
 	class="w-80 h-24 border rounded-lg flex overflow-hidden transition-all duration-300 hover:shadow-sm bg-card mx-1"
+	aria-labelledby={subscriptionNameId}
 >
-	<!-- Left: Name -->
-	<div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">
-		{subscription['Name']}
-	</div>
-
-	<Separator orientation="vertical" class="mx-1" />
-
-	<!-- Middle: Amount -->
-	<div class="w-24 flex items-center justify-center text-sm font-medium">
-		{formattedAmount}
-	</div>
-
-	<Separator orientation="vertical" class="mx-1" />
-
-	<!-- Right: Date + Days -->
-	<div class="w-33 flex flex-col items-center justify-center text-xs">
-		<div>
-			{formattedDate}
+	<dl class="contents">
+		<div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">
+			<dt class="sr-only">Subscription name</dt>
+			<dd id={subscriptionNameId}>{subscription['Name']}</dd>
 		</div>
 
-		<Separator class="my-1" />
+		<Separator orientation="vertical" class="mx-1" />
 
-		<div class="text-muted-foreground">
-			{formattedDays}
+		<div class="w-24 flex items-center justify-center text-sm font-medium">
+			<dt class="sr-only">Subscription amount</dt>
+			<dd>{formattedAmount}</dd>
 		</div>
-	</div>
 
-	<!-- Additional Right: Action Buttons -->
+		<Separator orientation="vertical" class="mx-1" />
+
+		<div class="w-33 flex flex-col items-center justify-center text-xs">
+			<div>
+				<dt class="sr-only">Next payment date</dt>
+				<dd>{formattedDate}</dd>
+			</div>
+
+			<Separator class="my-1" />
+
+			<div class="text-muted-foreground">
+				<dt class="sr-only">Time until next payment</dt>
+				<dd>{formattedDays}</dd>
+			</div>
+		</div>
+	</dl>
 	{#if showActions}
 		<Separator orientation="vertical" class="mx-1" />
 
@@ -140,16 +150,16 @@
 						aria-label="Cancel subscription deletion"
 						onclick={() => (confirmDelete = false)}
 					>
-						<X />
+						<X aria-hidden="true" />
 					</Button>
 				{:else}
 					<Dialog.Root bind:open={editOpen}>
 						<Dialog.Trigger
 							class={buttonVariants({ variant: 'ghost' })}
-							aria-label="Edit goal"
+							aria-label="Edit subscription"
 							onclick={openEditDialog}
 						>
-							<Pencil />
+							<Pencil aria-hidden="true" />
 						</Dialog.Trigger>
 						<Dialog.Content class="sm:max-w-[425px]">
 							<Dialog.Header>
@@ -192,7 +202,7 @@
 													{editLastPaid
 														? new Date(`${editLastPaid}T00:00:00`).toLocaleDateString()
 														: 'Select date'}
-													<CalendarIcon class="size-4" />
+													<CalendarIcon class="size-4" aria-hidden="true" />
 												</Button>
 											{/snippet}
 										</Popover.Trigger>
@@ -228,16 +238,20 @@
 			<div>
 				<Button
 					variant="ghost"
-					aria-label={confirmDelete ? 'Confirm deletion' : 'Delete subscription'}
+					aria-label={confirmDelete ? 'Confirm subscription deletion' : 'Delete subscription'}
 					onclick={deleteSubscription}
 				>
 					{#if confirmDelete}
-						<Check />
+						<Check aria-hidden="true" />
+						<span class="sr-only" aria-live="polite">
+							Deletion confirmation active. Press confirm deletion to remove this subscription, or
+							cancel deletion.
+						</span>
 					{:else}
-						<Trash />
+						<Trash aria-hidden="true" />
 					{/if}
 				</Button>
 			</div>
 		</div>
 	{/if}
-</div>
+</article>
