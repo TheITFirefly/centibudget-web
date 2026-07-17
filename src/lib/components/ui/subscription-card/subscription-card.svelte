@@ -89,6 +89,7 @@
 			confirmDelete = true;
 			return;
 		}
+		confirmDelete = false;
 		budget.current = {
 			...budget.current,
 			Allocations: budget.current['Allocations'].filter((a) => a['Name'] !== subscription['Name'])
