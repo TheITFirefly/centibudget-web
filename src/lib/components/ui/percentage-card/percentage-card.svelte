@@ -8,6 +8,7 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { EditPercentageDialog } from '$lib/components/ui/edit-percentage-dialog/index.js';
 	import { Check, X, Pencil, Trash } from 'lucide-svelte';
 
 	let { percentAllocation, showActions = false } = $props();
@@ -61,6 +62,7 @@
 				(a) => a['Name'] !== percentAllocation['Name']
 			)
 		};
+		confirmDelete = false;
 	}
 </script>
 
@@ -84,64 +86,14 @@
 					<X />
 				</Button>
 			{:else}
-				<Dialog.Root bind:open={editOpen}>
-					<Dialog.Trigger
-						class={buttonVariants({ variant: 'ghost' })}
-						aria-label="Edit percentage allocation"
-						onclick={openEditDialog}
-					>
-						<Pencil />
-					</Dialog.Trigger>
-					<Dialog.Content class="sm:max-w-[425px]">
-						<Dialog.Header>
-							<Dialog.Title>Edit Percentage Allocation</Dialog.Title>
-							<Dialog.Description>Update Percentage Allocation Details</Dialog.Description>
-						</Dialog.Header>
-
-						<div class="grid gap-4 py-4">
-							<div class="grid gap-2">
-								<Label for="allocation-name">Name (Cannot be changed)</Label>
-								<Input id="allocation-name" readonly bind:value={editName} />
-							</div>
-
-							<div class="grid gap-2">
-								<Label for="allocation-percent">Percentage</Label>
-								<Input
-									id="allocation-percent"
-									type="number"
-									min="0"
-									max="100"
-									bind:value={editAmount}
-								/>
-							</div>
-
-							<div class="grid gap-2">
-								<Label>Account</Label>
-								<Select.Root type="single" bind:value={editAccount}>
-									<Select.Trigger class="w-full">
-										{editAccount || 'Select an account'}
-									</Select.Trigger>
-
-									<Select.Content>
-										{#each accounts as account}
-											<Select.Item value={account['Name']}>
-												{account['Name']}
-											</Select.Item>
-										{/each}
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</div>
-
-						<Dialog.Footer>
-							<Dialog.Close>
-								<Button variant="outline">Cancel</Button>
-							</Dialog.Close>
-
-							<Button onclick={saveAllocation}>Save</Button>
-						</Dialog.Footer>
-					</Dialog.Content>
-				</Dialog.Root>
+				<Button
+					variant="ghost"
+					onclick={() => (editOpen = true)}
+					aria-label="Edit percentage allocation"
+				>
+					<Pencil aria-hidden="true" />
+				</Button>
+				<EditPercentageDialog bind:open={editOpen} {percentAllocation} />
 			{/if}
 
 			<Separator orientation="vertical" class="h-6" />
