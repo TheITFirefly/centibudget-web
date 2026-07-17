@@ -5,20 +5,21 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { budget } from '$lib/shared.svelte';
+	import type { Allocation } from '$lib/schemas/budget';
 
 	let {
 		open = $bindable(),
 		percentAllocation
 	}: {
 		open: boolean;
-		percentAllocation: any;
+		percentAllocation: Allocation;
 	} = $props();
 
-	let editName = $derived(percentAllocation['Name']);
-	let editAmount = $derived(percentAllocation['Amount']);
-	let editAccount = $derived(percentAllocation['Account']);
+	let editName = $derived(percentAllocation.Name);
+	let editAmount = $derived(percentAllocation.Amount);
+	let editAccount = $derived(percentAllocation.Account);
 
-	const accounts = $derived(budget.current['Accounts']);
+	const accounts = $derived(budget.current.Accounts);
 
 	function saveAllocation() {
 		budget.current = {
