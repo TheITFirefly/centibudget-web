@@ -13,7 +13,7 @@
 		showActions = false
 	}: {
 		savingsGoalAllocation: Allocation;
-		showActions: boolean;
+		showActions?: boolean;
 	} = $props();
 
 	// Edit state

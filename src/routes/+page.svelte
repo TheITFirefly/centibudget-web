@@ -63,9 +63,9 @@
 			<ul
 				class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,128px)] max-w-7xl mx-auto px-4"
 			>
-				{#each savingsGoals as savingsGoal}
+				{#each savingsGoals as savingsGoalAllocation}
 					<li>
-						<SavingsGoalCard savingsGoalAllocation={savingsGoal} />
+						<SavingsGoalCard {savingsGoalAllocation} />
 					</li>
 				{/each}
 			</ul>
@@ -88,9 +88,9 @@
 			<ul
 				class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,320px)] max-w-7xl mx-auto px-4"
 			>
-				{#each subscriptions as subscription}
+				{#each subscriptions as subscriptionAllocation}
 					<li>
-						<SubscriptionCard {subscription} />
+						<SubscriptionCard {subscriptionAllocation} />
 					</li>
 				{/each}
 			</ul>

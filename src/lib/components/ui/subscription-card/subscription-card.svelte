@@ -1,39 +1,27 @@
 <script lang="ts">
 	import { formatCurrency, formatDate, formatDays } from '$lib/formatters';
-	import { Pencil, Trash, Check, X, CalendarIcon } from '@lucide/svelte';
-	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input';
+	import { Pencil, Trash, Check, X } from '@lucide/svelte';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { budget } from '$lib/shared.svelte';
-	import { Label } from '$lib/components/ui/label';
-	import Separator from '../separator/separator.svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
-	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { CalendarDate } from '@internationalized/date';
 	import type { Allocation } from '$lib/schemas/budget';
+	import { EditSubscriptionDialog } from '$lib/components/ui/edit-subscription-dialog/index.js';
 
 	let {
-		subscription,
+		subscriptionAllocation,
 		showActions = false
 	}: {
-		subscription: Allocation;
-		showActions: boolean;
+		subscriptionAllocation: Allocation;
+		showActions?: boolean;
 	} = $props();
 
 	let confirmDelete = $state(false);
 	let editOpen = $state(false);
-	let calendarOpen = $state(false);
-
-	let editName = $state('');
-	let editAmount = $state(0);
-	let editPeriod = $state('Monthly');
-	let editLastPaid = $state('');
-	let calendarValue = $state<CalendarDate | undefined>();
 
 	//remove special characters, lowercase (slugify)
 	const subscriptionNameId = $derived(
-		`subscription-title-${subscription.Name.toLowerCase()
+		`subscription-title-${subscriptionAllocation.Name.toLowerCase()
 			.replace(/[^a-z0-9]+/g, '-')
 			.replace(/^-|-$/g, '')}`
 	);
@@ -56,40 +44,6 @@
 		return Math.max(0, Math.floor((date.getTime() - now.getTime()) / 86_400_000));
 	}
 
-	function openEditDialog() {
-		editName = subscription.Name;
-		editAmount = subscription.Amount;
-		editPeriod = subscription.Period;
-		editLastPaid = subscription['Last Paid'] ?? '';
-
-		if (editLastPaid) {
-			const [y, m, d] = editLastPaid.split('-').map(Number);
-			calendarValue = new CalendarDate(y, m, d);
-		} else {
-			calendarValue = undefined;
-		}
-
-		editOpen = true;
-	}
-
-	function saveSubscription() {
-		budget.current = {
-			...budget.current,
-			Allocations: budget.current.Allocations.map((allocation) =>
-				allocation.Name === subscription.Name
-					? {
-							...allocation,
-							Name: editName,
-							Amount: Number(editAmount),
-							Period: editPeriod,
-							'Last Paid': editLastPaid || null
-						}
-					: allocation
-			)
-		};
-		editOpen = false;
-	}
-
 	function deleteSubscription() {
 		if (!confirmDelete) {
 			confirmDelete = true;
@@ -99,19 +53,19 @@
 		budget.current = {
 			...budget.current,
 			Allocations: budget.current.Allocations.filter(
-				(allocation) => allocation.Name !== subscription.Name
+				(allocation) => allocation.Name !== subscriptionAllocation.Name
 			)
 		};
 	}
 
 	const nextPayDate = $derived(
-		subscription['Last Paid']
-			? calculateNextPayDate(subscription['Last Paid'], subscription['Period'])
+		subscriptionAllocation['Last Paid']
+			? calculateNextPayDate(subscriptionAllocation['Last Paid'], subscriptionAllocation['Period'])
 			: null
 	);
 	const daysLeft = $derived(nextPayDate ? daysUntil(nextPayDate) : 0);
 	const formattedDate = $derived(formatDate(nextPayDate));
-	const formattedAmount = $derived(formatCurrency(subscription.Amount));
+	const formattedAmount = $derived(formatCurrency(subscriptionAllocation.Amount));
 	const formattedDays = $derived(formatDays(daysLeft));
 </script>
 
@@ -122,7 +76,7 @@
 	<dl class="contents">
 		<div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">
 			<dt class="sr-only">Subscription name</dt>
-			<dd id={subscriptionNameId}>{subscription.Name}</dd>
+			<dd id={subscriptionNameId}>{subscriptionAllocation.Name}</dd>
 		</div>
 
 		<Separator orientation="vertical" class="mx-1" />
@@ -162,85 +116,10 @@
 						<X aria-hidden="true" />
 					</Button>
 				{:else}
-					<Dialog.Root bind:open={editOpen}>
-						<Dialog.Trigger
-							class={buttonVariants({ variant: 'ghost' })}
-							aria-label="Edit subscription"
-							onclick={openEditDialog}
-						>
-							<Pencil aria-hidden="true" />
-						</Dialog.Trigger>
-						<Dialog.Content class="sm:max-w-[425px]">
-							<Dialog.Header>
-								<Dialog.Title>Edit Subscription</Dialog.Title>
-								<Dialog.Description>Update subscription details.</Dialog.Description>
-							</Dialog.Header>
-							<div class="grid gap-4 py-4">
-								<div class="grid gap-2">
-									<Label for="subscription-name">Name (Cannot be changed)</Label>
-									<Input id="subscription-name" readonly bind:value={editName} />
-								</div>
-								<div class="grid gap-2">
-									<Label for="subscription-amount">Amount</Label>
-									<Input id="subscription-amount" type="number" bind:value={editAmount} />
-								</div>
-								<div class="grid gap-2">
-									<Label for="subscription-period">Period</Label>
-									<Select.Root type="single" bind:value={editPeriod}>
-										<Select.Trigger class="w-full">
-											{editPeriod || 'Select a period'}
-										</Select.Trigger>
-										<Select.Content>
-											<Select.Item value="Weekly">Weekly</Select.Item>
-											<Select.Item value="Biweekly">Biweekly</Select.Item>
-											<Select.Item value="Monthly">Monthly</Select.Item>
-											<Select.Item value="Yearly">Yearly</Select.Item>
-										</Select.Content>
-									</Select.Root>
-								</div>
-								<div class="grid gap-2">
-									<Label for="subscription-last-paid">Last Paid</Label>
-									<Popover.Root bind:open={calendarOpen}>
-										<Popover.Trigger id="subscription-last-paid">
-											{#snippet child({ props })}
-												<Button
-													{...props}
-													variant="outline"
-													class="w-full justify-between font-normal"
-												>
-													{editLastPaid
-														? new Date(`${editLastPaid}T00:00:00`).toLocaleDateString()
-														: 'Select date'}
-													<CalendarIcon class="size-4" aria-hidden="true" />
-												</Button>
-											{/snippet}
-										</Popover.Trigger>
-										<Popover.Content class="w-auto overflow-hidden p-0" align="start">
-											<Calendar
-												type="single"
-												bind:value={calendarValue}
-												captionLayout="dropdown"
-												onValueChange={(v) => {
-													if (v) {
-														editLastPaid = `${v.year}-${String(v.month).padStart(2, '0')}-${String(v.day).padStart(2, '0')}`;
-													}
-													calendarOpen = false;
-												}}
-												minValue={today(getLocalTimeZone()).subtract({ years: 2 })}
-												maxValue={today(getLocalTimeZone())}
-											/>
-										</Popover.Content>
-									</Popover.Root>
-								</div>
-							</div>
-							<Dialog.Footer>
-								<Dialog.Close>
-									<Button variant="outline">Cancel</Button>
-								</Dialog.Close>
-								<Button onclick={saveSubscription}>Save</Button>
-							</Dialog.Footer>
-						</Dialog.Content>
-					</Dialog.Root>
+					<Button variant="ghost" onclick={() => (editOpen = true)}>
+						<Pencil />
+					</Button>
+					<EditSubscriptionDialog bind:open={editOpen} {subscriptionAllocation} />
 				{/if}
 			</div>
 			<Separator class="my-1" />
