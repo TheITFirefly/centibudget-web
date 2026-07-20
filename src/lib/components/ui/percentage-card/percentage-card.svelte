@@ -9,7 +9,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { EditPercentageDialog } from '$lib/components/ui/edit-percentage-dialog/index.js';
-	import { Check, X, Pencil, Trash } from 'lucide-svelte';
+	import { Check, X, Pencil, Trash } from '@lucide/svelte';
 
 	let { percentAllocation, showActions = false } = $props();
 

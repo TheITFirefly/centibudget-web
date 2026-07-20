@@ -10,7 +10,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
 
-	import { BanknoteArrowUp, CirclePlus, CircleX } from 'lucide-svelte';
+	import { BanknoteArrowUp, CirclePlus, CircleX } from '@lucide/svelte';
 
 	let income = $derived(budget.current['Funding Sources']);
 

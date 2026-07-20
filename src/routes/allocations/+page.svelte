@@ -8,7 +8,7 @@
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import PercentageCard from '$lib/components/ui/percentage-card/percentage-card.svelte';
 	import { budget } from '$lib/shared.svelte';
-	import { CalendarSync, Target, CirclePercent, CirclePlus, CircleX } from 'lucide-svelte';
+	import { CalendarSync, Target, CirclePercent, CirclePlus, CircleX } from '@lucide/svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 	import AddAllocationDialog from '$lib/components/ui/add-allocation-dialog/add-allocation-dialog.svelte';
 	import type { Allocation, AllocationPeriod, AllocationType } from '$lib/schemas/budget';

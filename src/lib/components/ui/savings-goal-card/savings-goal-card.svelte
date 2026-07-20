@@ -8,7 +8,7 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Check, X, Pencil, Trash } from 'lucide-svelte';
+	import { Check, X, Pencil, Trash } from '@lucide/svelte';
 	import { EditSavingsGoalDialog } from '$lib/components/ui/edit-savings-goal-dialog/index.js';
 
 	let { savingsGoalAllocation, showActions = false } = $props();

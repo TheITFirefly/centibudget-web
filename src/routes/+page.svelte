@@ -5,7 +5,7 @@
 	import FundingSourceCard from '$lib/components/ui/funding-source-card/funding-source-card.svelte';
 	import SubscriptionCard from '$lib/components/ui/subscription-card/subscription-card.svelte';
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
-	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
+	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from '@lucide/svelte';
 	import { budget } from '$lib/shared.svelte';
 	import type { AllocationPeriod } from '$lib/schemas/budget';
 

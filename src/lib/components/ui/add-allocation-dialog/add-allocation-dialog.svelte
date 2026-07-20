@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
-	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarIcon } from '@lucide/svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 	import { budget } from '$lib/shared.svelte';
 

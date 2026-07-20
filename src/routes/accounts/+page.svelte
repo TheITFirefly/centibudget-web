@@ -10,7 +10,7 @@
 
 	import { budget } from '$lib/shared.svelte';
 
-	import { PiggyBank, CirclePlus, CircleX } from 'lucide-svelte';
+	import { PiggyBank, CirclePlus, CircleX } from '@lucide/svelte';
 
 	let accounts = $derived(budget.current['Accounts']);
 

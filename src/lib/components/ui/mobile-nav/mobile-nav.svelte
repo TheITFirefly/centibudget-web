@@ -2,8 +2,7 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { resolve } from '$app/paths';
-	import { Menu } from 'lucide-svelte';
-	import { X } from 'lucide-svelte';
+	import { Menu, X } from '@lucide/svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { DarkModeButton } from '$lib/components/ui/dark-mode-button/index.js';
 

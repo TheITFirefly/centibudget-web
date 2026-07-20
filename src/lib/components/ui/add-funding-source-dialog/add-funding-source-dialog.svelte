@@ -9,7 +9,7 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 
-	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarIcon } from '@lucide/svelte';
 
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 

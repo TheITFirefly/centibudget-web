@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { formatCurrency, formatDate, formatDays } from '$lib/formatters';
-	import { Pencil, Trash, Check, X, CalendarIcon } from 'lucide-svelte';
+	import { Pencil, Trash, Check, X, CalendarIcon } from '@lucide/svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { budget } from '$lib/shared.svelte';

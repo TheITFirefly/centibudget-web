@@ -1,15 +1,14 @@
 <script lang="ts">
 	import * as Empty from '$lib/components/ui/empty/index.js';
-	import type { Component } from 'svelte';
+	import { type LucideIcon } from '@lucide/svelte';
 
-	// Props using Svelte 5 $props() rune
 	let {
 		icon: IconComponent,
 		title,
 		description,
 		href
 	}: {
-		icon: Component;
+		icon: LucideIcon;
 		title: string;
 		description: string;
 		href: string;
@@ -25,7 +24,7 @@
 	</Empty.Header>
 	<Empty.Content>
 		<Empty.Description>
-			{description} <a href={href}>here</a>
+			{description} <a {href}>here</a>
 		</Empty.Description>
 	</Empty.Content>
 </Empty.Root>
