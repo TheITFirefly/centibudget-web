@@ -1,7 +1,5 @@
-<script>
+<script lang="ts">
 	import { resolve } from '$app/paths';
-	import * as Empty from '$lib/components/ui/empty/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import SavingsGoalCard from '$lib/components/ui/savings-goal-card/savings-goal-card.svelte';
 	import AccountCard from '$lib/components/ui/account-card/account-card.svelte';
 	import FundingSourceCard from '$lib/components/ui/funding-source-card/funding-source-card.svelte';
@@ -9,33 +7,15 @@
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import { Target, PiggyBank, CalendarSync, BanknoteArrowUp } from 'lucide-svelte';
 	import { budget } from '$lib/shared.svelte';
-	import EmptyContent from '$lib/components/ui/empty/empty-content.svelte';
+	import type { AllocationPeriod } from '$lib/schemas/budget';
 
 	let income = $derived(budget.current['Funding Sources']);
-	let allocations = $derived(budget.current['Allocations']);
-	let savingsGoals = $derived(allocations.filter((allocation) => allocation['Type'] === 'Fixed'));
+	let allocations = $derived(budget.current.Allocations);
+	let savingsGoals = $derived(allocations.filter((allocation) => allocation.Type === 'Fixed'));
 	let subscriptions = $derived(
-		allocations.filter((allocation) => allocation['Type'] === 'Subscription')
+		allocations.filter((allocation) => allocation.Type === 'Subscription')
 	);
-	let accounts = $derived(budget.current['Accounts']);
-
-	function calculateNextPayDate(lastPaidDate, period) {
-		const lastPaid = new Date(lastPaidDate);
-		let nextPayDate = new Date(lastPaid);
-
-		if (period === 'Biweekly') {
-			nextPayDate.setDate(lastPaid.getDate() + 30);
-		}
-		// TODO: make this aware of the different periods a subscription can have
-
-		return nextPayDate;
-	}
-
-	function daysUntilNextPayDate(nextPayDate) {
-		const today = new Date();
-		const timeDifference = nextPayDate - today;
-		return Math.floor(timeDifference / (1000 * 3600 * 24)); // Convert milliseconds to days
-	}
+	let accounts = $derived(budget.current.Accounts);
 </script>
 
 <svelte:head>
@@ -58,9 +38,9 @@
 			<ul
 				class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,256px)] max-w-7xl mx-auto px-4"
 			>
-				{#each income as source}
+				{#each income as fundingSource}
 					<li>
-						<FundingSourceCard {source} />
+						<FundingSourceCard {fundingSource} />
 					</li>
 				{/each}
 			</ul>
@@ -85,7 +65,7 @@
 			>
 				{#each savingsGoals as savingsGoal}
 					<li>
-						<SavingsGoalCard goal={savingsGoal} />
+						<SavingsGoalCard savingsGoalAllocation={savingsGoal} />
 					</li>
 				{/each}
 			</ul>

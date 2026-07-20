@@ -24,10 +24,10 @@ export class LocalStorage<T> {
     }
   }
 
-  get current() {
+  get current(): T {
     this.#version;
 
-    const root =
+    const root: T =
       typeof localStorage !== "undefined"
         ? JSON.parse(localStorage.getItem(this.#key) as any)
         : this.#value;

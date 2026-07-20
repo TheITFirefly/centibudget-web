@@ -46,8 +46,8 @@
 
 	<div class="max-w-7xl mx-auto px-4">
 		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,256px)]">
-			{#each income as source}
-				<FundingSourceCard {source} />
+			{#each income as fundingSource}
+				<FundingSourceCard {fundingSource} />
 			{/each}
 		</div>
 	</div>

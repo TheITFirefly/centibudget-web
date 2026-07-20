@@ -9,8 +9,9 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Check, X, Pencil, Trash } from 'lucide-svelte';
+	import { EditSavingsGoalDialog } from '$lib/components/ui/edit-savings-goal-dialog/index.js';
 
-	let { goal, showActions = false } = $props();
+	let { savingsGoalAllocation, showActions = false } = $props();
 
 	// Edit state
 	let editOpen = $state(false);
@@ -22,22 +23,22 @@
 	const accounts = $derived(budget.current['Accounts']);
 	//remove special characters, lowercase (slugify)
 	const goalNameId = $derived(
-		`goal-title-${goal['Name']
+		`goal-title-${savingsGoalAllocation['Name']
 			.toLowerCase()
 			.replace(/[^a-z0-9]+/g, '-')
 			.replace(/^-|-$/g, '')}`
 	);
 	const balance = $derived(
-		accounts.find((acc) => acc['Name'] === goal['Account'])?.['Balance'] ?? 0
+		accounts.find((acc) => acc['Name'] === savingsGoalAllocation['Account'])?.['Balance'] ?? 0
 	);
 	const progress = $derived.by(() => {
-		const total = goal['Amount'];
+		const total = savingsGoalAllocation['Amount'];
 		if (!total) return 0;
 		return Math.min(100, Math.round((balance / total) * 100));
 	});
 
 	const formattedBalance = $derived(formatCurrency(balance));
-	const formattedTotal = $derived(formatCurrency(goal['Amount']));
+	const formattedTotal = $derived(formatCurrency(savingsGoalAllocation['Amount']));
 	const isComplete = $derived(progress >= 100);
 
 	// Radial chart math
@@ -46,22 +47,10 @@
 	const strokeDashoffset = $derived(circumference - (progress / 100) * circumference);
 
 	function openEditDialog() {
-		editName = goal['Name'];
-		editAmount = goal['Amount'];
-		editAccount = goal['Account'];
+		editName = savingsGoalAllocation['Name'];
+		editAmount = savingsGoalAllocation['Amount'];
+		editAccount = savingsGoalAllocation['Account'];
 		editOpen = true;
-	}
-
-	function saveGoal() {
-		budget.current = {
-			...budget.current,
-			Allocations: budget.current['Allocations'].map((g) =>
-				g['Name'] === goal['Name']
-					? { ...g, Name: editName, Amount: Number(editAmount), Account: editAccount }
-					: g
-			)
-		};
-		editOpen = false;
 	}
 
 	function deleteGoal() {
@@ -71,14 +60,14 @@
 		}
 		budget.current = {
 			...budget.current,
-			Allocations: budget.current['Allocations'].filter((g) => g['Name'] !== goal['Name'])
+			Allocations: budget.current.Allocations.filter((g) => g.Name !== savingsGoalAllocation.Name)
 		};
 	}
 </script>
 
 <Card.Root class="overflow-hidden">
 	<Card.Header>
-		<Card.Title id={goalNameId} class="text-center">{goal['Name']}</Card.Title>
+		<Card.Title id={goalNameId} class="text-center">{savingsGoalAllocation['Name']}</Card.Title>
 	</Card.Header>
 
 	<Card.Content class="flex flex-col items-center gap-1 pb-0">
@@ -140,50 +129,10 @@
 					<X />
 				</Button>
 			{:else}
-				<Dialog.Root bind:open={editOpen}>
-					<Dialog.Trigger
-						class={buttonVariants({ variant: 'ghost' })}
-						aria-label="Edit goal"
-						onclick={openEditDialog}
-					>
-						<Pencil />
-					</Dialog.Trigger>
-					<Dialog.Content class="sm:max-w-[425px]">
-						<Dialog.Header>
-							<Dialog.Title>Edit Goal</Dialog.Title>
-							<Dialog.Description>Update your savings goal details.</Dialog.Description>
-						</Dialog.Header>
-						<div class="grid gap-4 py-4">
-							<div class="grid gap-2">
-								<Label for="goal-name">Name (Cannot be changed)</Label>
-								<Input id="goal-name" readonly bind:value={editName} />
-							</div>
-							<div class="grid gap-2">
-								<Label for="goal-amount">Target Amount</Label>
-								<Input id="goal-amount" type="number" bind:value={editAmount} />
-							</div>
-							<div class="grid gap-2">
-								<Label for="goal-account">Linked Account</Label>
-								<Select.Root type="single" bind:value={editAccount}>
-									<Select.Trigger class="w-full">
-										{editAccount || 'Select an account'}
-									</Select.Trigger>
-									<Select.Content>
-										{#each accounts as acc}
-											<Select.Item value={acc['Name']}>{acc['Name']}</Select.Item>
-										{/each}
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</div>
-						<Dialog.Footer>
-							<Dialog.Close>
-								<Button variant="outline">Cancel</Button>
-							</Dialog.Close>
-							<Button onclick={saveGoal}>Save</Button>
-						</Dialog.Footer>
-					</Dialog.Content>
-				</Dialog.Root>
+				<Button variant="ghost" onclick={openEditDialog} aria-label="Edit savings goal allocation">
+					<Pencil aria-hidden="true" />
+				</Button>
+				<EditSavingsGoalDialog bind:open={editOpen} {savingsGoalAllocation}/>
 			{/if}
 
 			<Separator orientation="vertical" class="h-6" />

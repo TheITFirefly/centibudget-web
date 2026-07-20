@@ -11,30 +11,30 @@
 	import { CalendarSync, Target, CirclePercent, CirclePlus, CircleX } from 'lucide-svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 	import AddAllocationDialog from '$lib/components/ui/add-allocation-dialog/add-allocation-dialog.svelte';
+	import type { Allocation, AllocationPeriod, AllocationType } from '$lib/schemas/budget';
 
-	let allocations = $derived(budget.current['Allocations']);
-	let savingsGoals = $derived(allocations.filter((allocation) => allocation['Type'] === 'Fixed'));
+	let allocations = $derived(budget.current.Allocations);
+	let savingsGoals = $derived(allocations.filter((allocation) => allocation.Type === 'Fixed'));
 	let subscriptions = $derived(
-		allocations.filter((allocation) => allocation['Type'] === 'Subscription')
+		allocations.filter((allocation) => allocation.Type === 'Subscription')
 	);
 	let percentAllocations = $derived(
-		allocations.filter((allocation) => allocation['Type'] === 'Percentage')
+		allocations.filter((allocation) => allocation.Type === 'Percentage')
 	);
-	let accounts = $derived(budget.current['Accounts']);
+	let accounts = $derived(budget.current.Accounts);
 
 	let actionButtonOpen = $state(false);
 	let addDialogOpen = $state(false);
-	let calendarOpen = $state(false);
 	let calendarValue = $state<CalendarDate | undefined>();
 
 	let name = $state('');
-	let type = $state<'Fixed' | 'Percentage' | 'Subscription'>('Fixed');
-	let period = $state('One-time');
+	let type = $state<AllocationType>('Fixed');
+	let period = $state<AllocationPeriod>('One-time');
 	let amount = $state(0);
 	let account = $state('');
 	let lastPaid = $state<string | null>(null);
 
-	function openAddDialog(selectedType: 'Fixed' | 'Percentage' | 'Subscription') {
+	function openAddDialog(selectedType: AllocationType) {
 		type = selectedType;
 		name = '';
 		amount = 0;
@@ -83,17 +83,17 @@
 			return;
 		}
 
-		if (allocations.some((a) => a['Name'] === name.trim())) {
+		if (allocations.some((allocation) => allocation.Name === name.trim())) {
 			alert('An allocation with that name already exists');
 			return;
 		}
 
-		const allocation = {
-			Name: name,
+		const allocation: Allocation = {
+			Name: name.trim(),
 			Type: type,
 			Period: period,
 			'Last Paid': type === 'Subscription' ? lastPaid : null,
-			Amount: Number(amount),
+			Amount: amount,
 			Account: account
 		};
 
@@ -105,7 +105,7 @@
 		addDialogOpen = false;
 	}
 
-	const dialogTitle: Record<string, string> = {
+	const dialogTitle: Record<AllocationType, string> = {
 		Fixed: 'Add Savings Goal',
 		Subscription: 'Add Subscription',
 		Percentage: 'Add Percent-Based Allocation'
@@ -130,7 +130,7 @@
 	<div class="max-w-7xl mx-auto px-4">
 		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,128px)]">
 			{#each savingsGoals as savingsGoal}
-				<SavingsGoalCard goal={savingsGoal} showActions={true} />
+				<SavingsGoalCard savingsGoalAllocation={savingsGoal} showActions={true} />
 			{/each}
 		</div>
 	</div>
@@ -168,7 +168,7 @@
 		href={resolve('/allocations')}
 	/>
 {:else}
-  <br />
+	<br />
 	<div class="max-w-7xl mx-auto">
 		<div class="grid gap-6 justify-center grid-cols-[repeat(auto-fit,128px)]">
 			{#each percentAllocations as percentAllocation}
