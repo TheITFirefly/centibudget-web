@@ -107,7 +107,7 @@
 		}
 
 		if (
-			fundingSources.some((source) => source['Name'].toLowerCase() === name.trim().toLowerCase())
+			fundingSources.some((source) => source.Name.toLowerCase() === name.trim().toLowerCase())
 		) {
 			alert('A funding source with that name already exists.');
 			return;
@@ -301,9 +301,7 @@
 
 			<div class="flex items-center gap-2">
 				<Switch id="knows-end-date-switch" bind:checked={knowsEndDate} />
-				<Label for="knows-end-date-switch" class="font-normal">
-					I know when this job will end
-				</Label>
+				<Label for="knows-end-date-switch" class="font-normal">I know when this job will end</Label>
 			</div>
 
 			{#if knowsEndDate}

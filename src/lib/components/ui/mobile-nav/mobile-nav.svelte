@@ -1,5 +1,5 @@
 <script>
-	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { resolve } from '$app/paths';
 	import { Menu, X } from '@lucide/svelte';

@@ -1,6 +1,12 @@
-<script lang=ts>
+<script lang="ts">
 	import { formatDate, formatDays } from '$lib/formatters';
-	let { fundingSource } = $props();
+	import type { AllocationPeriod, FundingSource } from '$lib/schemas/budget';
+
+	let {
+		fundingSource
+	}: {
+		fundingSource: FundingSource;
+	} = $props();
 
 	function calculateNextPayDate(lastPaidDate: string, period: AllocationPeriod): Date {
 		const lastPaid = new Date(lastPaidDate);
@@ -37,7 +43,7 @@
 		const timing = fundingSource['Pay Timing'];
 		if (!timing?.['First Pay Date']) return null;
 
-		return calculateNextPayDate(timing['First Pay Date'], timing['Period']);
+		return calculateNextPayDate(timing['First Pay Date'], timing.Period);
 	});
 
 	const daysLeft = $derived(nextPayDate ? daysUntilNextPayDate(nextPayDate) : 0);

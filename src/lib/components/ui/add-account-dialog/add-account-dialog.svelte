@@ -11,7 +11,7 @@
 		open: boolean;
 	} = $props();
 
-	let accounts = $derived(budget.current['Accounts']);
+	let accounts = $derived(budget.current.Accounts);
 
 	let name = $state('');
 	let balance = $state(0);
@@ -30,7 +30,7 @@
 			return;
 		}
 
-		if (accounts.some((acc) => acc['Name'] === name.trim())) {
+		if (accounts.some((account) => account.Name === name.trim())) {
 			alert('An account with this name already exists');
 			return;
 		}

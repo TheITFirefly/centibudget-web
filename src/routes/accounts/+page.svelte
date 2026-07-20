@@ -12,7 +12,7 @@
 
 	import { PiggyBank, CirclePlus, CircleX } from '@lucide/svelte';
 
-	let accounts = $derived(budget.current['Accounts']);
+	let accounts = $derived(budget.current.Accounts);
 
 	let addDialogOpen = $state(false);
 	let actionButtonOpen = $state(false);

@@ -11,8 +11,15 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
+	import type { Allocation } from '$lib/schemas/budget';
 
-	let { subscription, showActions = false } = $props();
+	let {
+		subscription,
+		showActions = false
+	}: {
+		subscription: Allocation;
+		showActions: boolean;
+	} = $props();
 
 	let confirmDelete = $state(false);
 	let editOpen = $state(false);
@@ -26,8 +33,7 @@
 
 	//remove special characters, lowercase (slugify)
 	const subscriptionNameId = $derived(
-		`subscription-title-${subscription['Name']
-			.toLowerCase()
+		`subscription-title-${subscription.Name.toLowerCase()
 			.replace(/[^a-z0-9]+/g, '-')
 			.replace(/^-|-$/g, '')}`
 	);
@@ -51,9 +57,9 @@
 	}
 
 	function openEditDialog() {
-		editName = subscription['Name'];
-		editAmount = subscription['Amount'];
-		editPeriod = subscription['Period'];
+		editName = subscription.Name;
+		editAmount = subscription.Amount;
+		editPeriod = subscription.Period;
 		editLastPaid = subscription['Last Paid'] ?? '';
 
 		if (editLastPaid) {
@@ -69,16 +75,16 @@
 	function saveSubscription() {
 		budget.current = {
 			...budget.current,
-			Allocations: budget.current['Allocations'].map((a) =>
-				a['Name'] === subscription['Name']
+			Allocations: budget.current.Allocations.map((allocation) =>
+				allocation.Name === subscription.Name
 					? {
-							...a,
+							...allocation,
 							Name: editName,
 							Amount: Number(editAmount),
 							Period: editPeriod,
 							'Last Paid': editLastPaid || null
 						}
-					: a
+					: allocation
 			)
 		};
 		editOpen = false;
@@ -92,7 +98,9 @@
 		confirmDelete = false;
 		budget.current = {
 			...budget.current,
-			Allocations: budget.current['Allocations'].filter((a) => a['Name'] !== subscription['Name'])
+			Allocations: budget.current.Allocations.filter(
+				(allocation) => allocation.Name !== subscription.Name
+			)
 		};
 	}
 
@@ -103,7 +111,7 @@
 	);
 	const daysLeft = $derived(nextPayDate ? daysUntil(nextPayDate) : 0);
 	const formattedDate = $derived(formatDate(nextPayDate));
-	const formattedAmount = $derived(formatCurrency(subscription['Amount']));
+	const formattedAmount = $derived(formatCurrency(subscription.Amount));
 	const formattedDays = $derived(formatDays(daysLeft));
 </script>
 
@@ -114,7 +122,7 @@
 	<dl class="contents">
 		<div class="flex-1 flex items-center justify-center px-3 text-sm font-semibold">
 			<dt class="sr-only">Subscription name</dt>
-			<dd id={subscriptionNameId}>{subscription['Name']}</dd>
+			<dd id={subscriptionNameId}>{subscription.Name}</dd>
 		</div>
 
 		<Separator orientation="vertical" class="mx-1" />

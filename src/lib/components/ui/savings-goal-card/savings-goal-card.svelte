@@ -2,56 +2,48 @@
 	import { budget } from '$lib/shared.svelte';
 	import { formatCurrency } from '$lib/formatters';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import * as Select from '$lib/components/ui/select/index.js';
-	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import { Check, X, Pencil, Trash } from '@lucide/svelte';
 	import { EditSavingsGoalDialog } from '$lib/components/ui/edit-savings-goal-dialog/index.js';
+	import type { Allocation } from '$lib/schemas/budget';
 
-	let { savingsGoalAllocation, showActions = false } = $props();
+	let {
+		savingsGoalAllocation,
+		showActions = false
+	}: {
+		savingsGoalAllocation: Allocation;
+		showActions: boolean;
+	} = $props();
 
 	// Edit state
 	let editOpen = $state(false);
 	let confirmDelete = $state(false);
-	let editName = $state('');
-	let editAmount = $state(0);
-	let editAccount = $state('');
 
-	const accounts = $derived(budget.current['Accounts']);
+	const accounts = $derived(budget.current.Accounts);
 	//remove special characters, lowercase (slugify)
 	const goalNameId = $derived(
-		`goal-title-${savingsGoalAllocation['Name']
-			.toLowerCase()
+		`goal-title-${savingsGoalAllocation.Name.toLowerCase()
 			.replace(/[^a-z0-9]+/g, '-')
 			.replace(/^-|-$/g, '')}`
 	);
 	const balance = $derived(
-		accounts.find((acc) => acc['Name'] === savingsGoalAllocation['Account'])?.['Balance'] ?? 0
+		accounts.find((account) => account.Name === savingsGoalAllocation.Account)?.Balance ?? 0
 	);
 	const progress = $derived.by(() => {
-		const total = savingsGoalAllocation['Amount'];
+		const total = savingsGoalAllocation.Amount;
 		if (!total) return 0;
 		return Math.min(100, Math.round((balance / total) * 100));
 	});
 
 	const formattedBalance = $derived(formatCurrency(balance));
-	const formattedTotal = $derived(formatCurrency(savingsGoalAllocation['Amount']));
+	const formattedTotal = $derived(formatCurrency(savingsGoalAllocation.Amount));
 	const isComplete = $derived(progress >= 100);
 
 	// Radial chart math
 	const radius = 40;
 	const circumference = 2 * Math.PI * radius;
 	const strokeDashoffset = $derived(circumference - (progress / 100) * circumference);
-
-	function openEditDialog() {
-		editName = savingsGoalAllocation['Name'];
-		editAmount = savingsGoalAllocation['Amount'];
-		editAccount = savingsGoalAllocation['Account'];
-		editOpen = true;
-	}
 
 	function deleteGoal() {
 		if (!confirmDelete) {
@@ -62,12 +54,13 @@
 			...budget.current,
 			Allocations: budget.current.Allocations.filter((g) => g.Name !== savingsGoalAllocation.Name)
 		};
+		confirmDelete = false;
 	}
 </script>
 
 <Card.Root class="overflow-hidden">
 	<Card.Header>
-		<Card.Title id={goalNameId} class="text-center">{savingsGoalAllocation['Name']}</Card.Title>
+		<Card.Title id={goalNameId} class="text-center">{savingsGoalAllocation.Name}</Card.Title>
 	</Card.Header>
 
 	<Card.Content class="flex flex-col items-center gap-1 pb-0">
@@ -129,10 +122,14 @@
 					<X />
 				</Button>
 			{:else}
-				<Button variant="ghost" onclick={openEditDialog} aria-label="Edit savings goal allocation">
+				<Button
+					variant="ghost"
+					onclick={() => (editOpen = true)}
+					aria-label="Edit savings goal allocation"
+				>
 					<Pencil aria-hidden="true" />
 				</Button>
-				<EditSavingsGoalDialog bind:open={editOpen} {savingsGoalAllocation}/>
+				<EditSavingsGoalDialog bind:open={editOpen} {savingsGoalAllocation} />
 			{/if}
 
 			<Separator orientation="vertical" class="h-6" />

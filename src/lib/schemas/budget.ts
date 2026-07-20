@@ -45,13 +45,13 @@ export interface Account {
   Transactions: Transaction[];
 }
 
-interface Transaction {
+export interface Transaction {
   Name: string | null;
   Amount: number;
   Date: string;
 }
 
-interface FundingSource {
+export interface FundingSource {
   Name: string;
   "Funding Type": FundingType;
   Rate: number;
@@ -59,7 +59,7 @@ interface FundingSource {
   "Hours Per Pay Period": number | null;
 }
 
-interface PayTiming {
+export interface PayTiming {
   "Start Date": string | null;
   "First Pay Date"?: string;
   Period: PayTimingPeriod;

@@ -9,16 +9,17 @@
 	import { CalendarIcon } from '@lucide/svelte';
 	import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
 	import { budget } from '$lib/shared.svelte';
+	import type { AllocationType } from '$lib/schemas/budget';
 
 	let {
 		open = $bindable(),
 		type = $bindable()
 	}: {
 		open: boolean;
-		type: 'Fixed' | 'Percentage' | 'Subscription';
+		type: AllocationType;
 	} = $props();
 
-	let accounts = $derived(budget.current['Accounts']);
+	let accounts = $derived(budget.current.Accounts);
 
 	let name = $state('');
 	let period = $state('One-time');
@@ -71,9 +72,9 @@
 			return;
 		}
 
-		const allocations = budget.current['Allocations'];
+		const allocations = budget.current.Allocations;
 
-		if (allocations.some((a) => a['Name'] === name.trim())) {
+		if (allocations.some((account) => account.Name === name.trim())) {
 			alert('An allocation with that name already exists');
 			return;
 		}
@@ -172,8 +173,8 @@
 				<Select.Root type="single" bind:value={account}>
 					<Select.Trigger class="w-full">{account || 'Select an account'}</Select.Trigger>
 					<Select.Content>
-						{#each accounts as acc}
-							<Select.Item value={acc['Name']}>{acc['Name']}</Select.Item>
+						{#each accounts as account}
+							<Select.Item value={account.Name}>{account.Name}</Select.Item>
 						{/each}
 					</Select.Content>
 				</Select.Root>
