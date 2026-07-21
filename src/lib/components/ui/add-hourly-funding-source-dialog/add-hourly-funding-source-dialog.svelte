@@ -15,6 +15,8 @@
 
 	import { budget } from '$lib/shared.svelte';
 
+	import type { FundingSource, FundingType, PayTimingPeriod } from '$lib/schemas/budget';
+
 	let {
 		open = $bindable()
 	}: {
@@ -23,15 +25,16 @@
 
 	let fundingSources = $derived(budget.current['Funding Sources']);
 
+	// Fixed for this dialog — this is always an hourly funding source.
+	const fundingType: FundingType = 'Hourly';
+
 	let name = $state('');
-	let fundingType = $state<'Hourly' | 'Salary'>('Hourly');
 	let rate = $state(0);
 
-	let period = $state('Biweekly');
-	let hoursPerPayPeriod = $state<number | null>(40);
+	let period = $state<PayTimingPeriod>('Biweekly');
+	let hoursPerPayPeriod = $state(40);
 
-	// Mirrors PayTiming's two gated questions from the CLI:
-	// "Do you currently work here?" and "Do you know when you'll finish?"
+	// Ongoing job by default: already employed, no known end date.
 	let currentlyEmployed = $state(true);
 	let knowsEndDate = $state(false);
 
@@ -54,7 +57,6 @@
 	$effect(() => {
 		if (open) {
 			name = '';
-			fundingType = 'Hourly';
 			rate = 0;
 
 			period = 'Biweekly';
@@ -73,18 +75,6 @@
 		}
 	});
 
-	// Hours Per Pay Period is only meaningful for Hourly sources (get_pay()
-	// only ever uses it for that type), so it's the one field that stays
-	// gated on funding type rather than following the CLI's always-ask.
-	$effect(() => {
-		if (fundingType === 'Salary') {
-			hoursPerPayPeriod = null;
-		} else if (hoursPerPayPeriod === null) {
-			hoursPerPayPeriod = 40;
-		}
-	});
-
-	// If they currently work there, there's no future start date.
 	$effect(() => {
 		if (currentlyEmployed) {
 			startDate = null;
@@ -92,7 +82,6 @@
 		}
 	});
 
-	// If they don't know when it ends, there's no end date.
 	$effect(() => {
 		if (!knowsEndDate) {
 			endDate = null;
@@ -106,10 +95,13 @@
 			return;
 		}
 
-		if (
-			fundingSources.some((source) => source.Name.toLowerCase() === name.trim().toLowerCase())
-		) {
+		if (fundingSources.some((source) => source.Name.toLowerCase() === name.trim().toLowerCase())) {
 			alert('A funding source with that name already exists.');
+			return;
+		}
+
+		if (Number(rate) <= 0) {
+			alert('Rate must be greater than 0.');
 			return;
 		}
 
@@ -128,23 +120,22 @@
 			return;
 		}
 
+		const newSource: FundingSource = {
+			Name: name.trim(),
+			'Funding Type': fundingType,
+			Rate: Number(rate),
+			'Pay Timing': {
+				'Start Date': startDate,
+				'First Pay Date': firstPayDate,
+				Period: period,
+				'End Date': endDate
+			},
+			'Hours Per Pay Period': hoursPerPayPeriod
+		};
+
 		budget.current = {
 			...budget.current,
-			'Funding Sources': [
-				...fundingSources,
-				{
-					Name: name.trim(),
-					'Funding Type': fundingType,
-					Rate: Number(rate),
-					'Pay Timing': {
-						'Start Date': startDate,
-						'First Pay Date': firstPayDate,
-						Period: period,
-						'End Date': endDate
-					},
-					'Hours Per Pay Period': hoursPerPayPeriod
-				}
-			]
+			'Funding Sources': [...fundingSources, newSource]
 		};
 
 		open = false;
@@ -154,8 +145,8 @@
 <Dialog.Root bind:open>
 	<Dialog.Content class="sm:max-w-[500px]">
 		<Dialog.Header>
-			<Dialog.Title>Add Funding Source</Dialog.Title>
-			<Dialog.Description>Add a new source of income to your budget.</Dialog.Description>
+			<Dialog.Title>Add Hourly Job</Dialog.Title>
+			<Dialog.Description>Add a new hourly job to your budget.</Dialog.Description>
 		</Dialog.Header>
 
 		<div class="grid gap-4 py-4">
@@ -165,36 +156,14 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label>Funding Type</Label>
-
-				<Select.Root type="single" bind:value={fundingType}>
-					<Select.Trigger class="w-full">
-						{fundingType}
-					</Select.Trigger>
-
-					<Select.Content>
-						<Select.Item value="Hourly">Hourly</Select.Item>
-
-						<Select.Item value="Salary">Salary</Select.Item>
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			<div class="grid gap-2">
-				<Label for="pay-rate-input">
-					{fundingType === 'Hourly' ? 'Hourly Rate' : 'Annual Salary'}
-				</Label>
-
+				<Label for="pay-rate-input">Hourly Rate</Label>
 				<Input id="pay-rate-input" type="number" bind:value={rate} />
 			</div>
 
-			{#if fundingType === 'Hourly'}
-				<div class="grid gap-2">
-					<Label for="hours-per-pay-period-input">Hours Per Pay Period</Label>
-
-					<Input id="hours-per-pay-period-input" type="number" bind:value={hoursPerPayPeriod} />
-				</div>
-			{/if}
+			<div class="grid gap-2">
+				<Label for="hours-per-pay-period-input">Hours Per Pay Period</Label>
+				<Input id="hours-per-pay-period-input" type="number" bind:value={hoursPerPayPeriod} />
+			</div>
 
 			<div class="grid gap-2">
 				<Label>Pay Period</Label>
@@ -209,7 +178,6 @@
 						<Select.Item value="Biweekly">Biweekly</Select.Item>
 						<Select.Item value="Monthly">Monthly</Select.Item>
 						<Select.Item value="Yearly">Yearly</Select.Item>
-						<Select.Item value="One-time">One-time</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
@@ -349,7 +317,7 @@
 				<Button variant="outline">Cancel</Button>
 			</Dialog.Close>
 
-			<Button onclick={addFundingSource}>Add Funding Source</Button>
+			<Button onclick={addFundingSource}>Add Job</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

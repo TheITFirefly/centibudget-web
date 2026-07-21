@@ -5,7 +5,9 @@
 
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import FundingSourceCard from '$lib/components/ui/funding-source-card/funding-source-card.svelte';
-	import AddFundingSourceDialog from '$lib/components/ui/add-funding-source-dialog/add-funding-source-dialog.svelte';
+	import { AddHourlyFundingSourceDialog } from '$lib/components/ui/add-hourly-funding-source-dialog/index.js';
+	import { AddSalariedFundingSourceDialog } from '$lib/components/ui/add-salaried-funding-source-dialog/index.js';
+	import { AddStudentFundingSourceDialog } from '$lib/components/ui/add-student-funding-source-dialog/index.js';
 
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { buttonVariants } from '$lib/components/ui/button/index.js';
@@ -14,7 +16,9 @@
 
 	let income = $derived(budget.current['Funding Sources']);
 
-	let addDialogOpen = $state(false);
+	let addHourlyDialogOpen = $state(false);
+	let addSalariedDialogOpen = $state(false);
+	let addStudentDialogOpen = $state(false);
 	let actionButtonOpen = $state(false);
 </script>
 
@@ -22,12 +26,15 @@
 	<title>Funding Sources - CentiBudget</title>
 </svelte:head>
 
-<AddFundingSourceDialog bind:open={addDialogOpen} />
+<AddHourlyFundingSourceDialog bind:open={addHourlyDialogOpen} />
+<AddSalariedFundingSourceDialog bind:open={addSalariedDialogOpen} />
+<AddStudentFundingSourceDialog bind:open={addStudentDialogOpen} />
 
 <h1 class="text-4xl text-heading mb-4">Funding Sources</h1>
 
 <p class="text-muted-foreground">
-	Add the jobs and other recurring income sources that fund your budget. Note that editing funding sources is not currently supported except for over in the testing area
+	Add the jobs and other recurring income sources that fund your budget. Note that editing funding
+	sources is not currently supported except for over in the testing area
 </p>
 
 <br />
@@ -75,10 +82,30 @@
 				class="py-3 px-4 text-base cursor-pointer"
 				onclick={() => {
 					actionButtonOpen = false;
-					addDialogOpen = true;
+					addHourlyDialogOpen = true;
 				}}
 			>
-				Add Funding Source
+				Add Hourly Job
+			</DropdownMenu.Item>
+
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => {
+					actionButtonOpen = false;
+					addSalariedDialogOpen = true;
+				}}
+			>
+				Add Salaried Job
+			</DropdownMenu.Item>
+
+			<DropdownMenu.Item
+				class="py-3 px-4 text-base cursor-pointer"
+				onclick={() => {
+					actionButtonOpen = false;
+					addStudentDialogOpen = true;
+				}}
+			>
+				Add Student Job
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
